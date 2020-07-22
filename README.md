@@ -1,2 +1,2 @@
 # g5
-a simple web server
+a simple http server
