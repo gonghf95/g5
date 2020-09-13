@@ -16,4 +16,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(src/base)
+add_subdirectory(src/net)
 add_subdirectory(examples)
