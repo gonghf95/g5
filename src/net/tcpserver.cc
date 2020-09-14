@@ -1,6 +1,7 @@
 #include "tcpserver.h"
 #include "acceptor.h"
 #include "channel.h"
+#include "tcpconnection.h"
 
 #include <string.h>
 #include <assert.h>
@@ -24,6 +25,8 @@ TcpServer::TcpServer()
 TcpServer::~TcpServer()
 {
 	delete acceptor_;
+
+	// FIXME: release memory of connections_
 }
 
 void TcpServer::start()
@@ -54,4 +57,6 @@ void TcpServer::start()
 void TcpServer::newConnection(int fd)
 {
 	cout << "new connection: " << fd << endl;
+	TcpConnection* conn = new TcpConnection(epfd_, fd);
+	connections_[fd] = conn;
 }

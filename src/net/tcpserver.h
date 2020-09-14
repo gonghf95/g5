@@ -3,7 +3,10 @@
 
 #include "iacceptorcallback.h"
 
+#include <map>
+
 class Acceptor;
+class TcpConnection;
 class TcpServer : public IAcceptorCallback
 {
 public:
@@ -18,6 +21,8 @@ public:
 private:
 	int epfd_;
 	Acceptor* acceptor_;
+
+	std::map<int, TcpConnection*> connections_;
 };
 
 #endif

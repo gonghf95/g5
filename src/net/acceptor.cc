@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 
 const char kIP[] = "127.0.0.1";
@@ -60,6 +61,10 @@ void Acceptor::onIn(int fd)
 	socklen_t addrlen = sizeof(cliaddr);
 	int connfd = accept(listenfd_, (struct sockaddr*)&cliaddr, &addrlen);
 	assert(connfd != -1);
+
+	int flags = fcntl(connfd, F_GETFL);
+	flags |= O_NONBLOCK;
+	fcntl(connfd, F_SETFL, flags);
 
 	if(callback_!=NULL)
 		callback_->newConnection(connfd);

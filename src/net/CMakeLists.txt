@@ -1,4 +1,5 @@
 set(net_SRCS
+ tcpconnection.cc
  acceptor.cc
  channel.cc
  tcpserver.cc
@@ -7,4 +8,4 @@ set(net_SRCS
 add_library(g5_net ${net_SRCS})
 target_link_libraries(g5_net pthread rt)
 
-#add_subdirectory(tests)
+add_subdirectory(tests)

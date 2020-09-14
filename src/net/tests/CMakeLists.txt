@@ -1,0 +1,2 @@
+add_executable(tcpserver_test tcpserver_test.cc)
+target_link_libraries(tcpserver_test g5_net)
