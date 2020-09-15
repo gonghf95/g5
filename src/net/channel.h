@@ -13,6 +13,7 @@ public:
 	void handleEvent();
 
 	int fd() { return fd_; }
+	int events() { return events_; }
 
 	void enableReading();
 
