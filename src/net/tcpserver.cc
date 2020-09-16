@@ -13,12 +13,10 @@
 
 using namespace std;
 
-TcpServer::TcpServer()
+TcpServer::TcpServer(EventLoop* loop)
+	: loop_(loop)
 {
-	epfd_ = epoll_create1(0);
-	assert(epfd_ != -1);
-	
-	acceptor_ = new Acceptor(epfd_);
+	acceptor_ = new Acceptor(loop);
 	acceptor_->setCallback(this);
 }
 
@@ -31,32 +29,12 @@ TcpServer::~TcpServer()
 
 void TcpServer::start()
 {
-	acceptor_->listen();
-
-	struct epoll_event events[MAXEVENTS];
-	while(true)
-	{
-		int nready = epoll_wait(epfd_, events, MAXEVENTS, -1);
-
-		vector<Channel*> channels;
-		for(int i=0; i<nready; ++i)
-		{
-			Channel* ch = static_cast<Channel*>(events[i].data.ptr);
-			ch->setRevents(events[i].events);
-			channels.push_back(ch);
-		}
-
-		vector<Channel*>::iterator it;
-		for(it=channels.begin(); it!=channels.end(); it++)
-		{
-			(*it)->handleEvent();
-		}
-	}
+	acceptor_->start();
 }
 
 void TcpServer::newConnection(int fd)
 {
 	cout << "new connection: " << fd << endl;
-	TcpConnection* conn = new TcpConnection(epfd_, fd);
+	TcpConnection* conn = new TcpConnection(loop_, fd);
 	connections_[fd] = conn;
 }

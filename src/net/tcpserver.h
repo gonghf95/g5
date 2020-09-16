@@ -7,10 +7,11 @@
 
 class Acceptor;
 class TcpConnection;
+class EventLoop;
 class TcpServer : public IAcceptorCallback
 {
 public:
-	TcpServer();
+	TcpServer(EventLoop* loop);
 	~TcpServer();
 
 	void start();
@@ -19,7 +20,7 @@ public:
 	void newConnection(int fd);
 
 private:
-	int epfd_;
+	EventLoop* loop_;
 	Acceptor* acceptor_;
 
 	std::map<int, TcpConnection*> connections_;

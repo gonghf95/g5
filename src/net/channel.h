@@ -1,11 +1,12 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+class EventLoop;
 class IChannelCallback;
 class Channel
 {
 public:
-	Channel(int epollfd, int fd);
+	Channel(EventLoop* loop, int fd);
 	~Channel();
 	
 	void setCallback(IChannelCallback* callback);
@@ -18,10 +19,10 @@ public:
 	void enableReading();
 
 private:
-	int epollfd_;
 	int fd_;
 	int events_;
 	int revents_;
+	EventLoop* loop_;
 	IChannelCallback* callback_;
 };
 

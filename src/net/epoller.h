@@ -13,7 +13,7 @@ public:
 	Epoller();
 	virtual ~Epoller();
 
-	void poll(std::vector<Channel*>* channels);
+	void poll(std::vector<Channel*>& channels);
 	void update(Channel* channel);
 
 private:

@@ -15,14 +15,14 @@ Epoller::~Epoller()
 {
 }
 
-void Epoller::poll(vector<Channel*>* channels)
+void Epoller::poll(vector<Channel*>& channels)
 {
 	int nready = epoll_wait(epfd_, events_, MAXEVENTS, -1);
 	for(int i=0; i<nready; ++i)
 	{
 		Channel* ch = static_cast<Channel*>(events_[i].data.ptr);
 		ch->setRevents(events_[i].events);
-		channels->push_back(ch);
+		channels.push_back(ch);
 	}
 }
 

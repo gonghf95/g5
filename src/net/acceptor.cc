@@ -2,6 +2,7 @@
 #include "channel.h"
 #include "iacceptorcallback.h"
 #include "ichannelcallback.h"
+#include "eventloop.h"
 #include <assert.h>
 #include <string.h>
 #include <arpa/inet.h>
@@ -38,10 +39,11 @@ int createAndListen(const char* ip, int port)
 
 } // namespace detail
 
-Acceptor::Acceptor(int epfd)
-	: epfd_(epfd),
-	channel_(NULL),
-	callback_(NULL)
+Acceptor::Acceptor(EventLoop* loop)
+	: listenfd_(-1), 
+	 channel_(NULL),
+	 loop_(loop),
+	 callback_(NULL)
 {
 }
 
@@ -70,10 +72,10 @@ void Acceptor::onIn(int fd)
 		callback_->newConnection(connfd);
 }
 
-void Acceptor::listen()
+void Acceptor::start()
 {
 	listenfd_ = detail::createAndListen(kIP, kPort);
-	channel_ = new Channel(epfd_, listenfd_);
+	channel_ = new Channel(loop_, listenfd_);
 	channel_->setCallback(this);
 	channel_->enableReading();
 }

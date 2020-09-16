@@ -6,11 +6,11 @@
 
 using namespace std;
 
-TcpConnection::TcpConnection(int epfd, int fd)
- : epfd_(epfd),
-  fd_(fd)
+TcpConnection::TcpConnection(EventLoop* loop, int fd)
+ : fd_(fd),
+ loop_(loop)
 {
-	channel_ = new Channel(epfd_, fd_);
+	channel_ = new Channel(loop_, fd_);
 	channel_->setCallback(this);
 	channel_->enableReading();
 }
@@ -25,5 +25,5 @@ void TcpConnection::onIn(int fd)
 	cout << "TcpConnection::onIn() receive data, but not read.\n";
 	char buf[1024] = {0};
 	int nread = read(fd, buf, sizeof(buf));
-	cout << buf << endl;
+	cout << "receive bytes: "<< nread << ", "<< buf << endl;
 }

@@ -1,10 +1,11 @@
 #include "channel.h"
 #include "ichannelcallback.h"
+#include "eventloop.h"
 #include <sys/epoll.h>
 
-Channel::Channel(int epollfd, int fd)
-	: epollfd_(epollfd),
-	fd_(fd)
+Channel::Channel(EventLoop* loop, int fd)
+	: fd_(fd),
+	 loop_(loop)
 {
 }
 
@@ -32,8 +33,5 @@ void Channel::enableReading()
 {
 	events_ |= EPOLLIN;
 
-	struct epoll_event ev;
-	ev.data.ptr = this;
-	ev.events = events_;
-	epoll_ctl(epollfd_, EPOLL_CTL_ADD, fd_, &ev);
+	loop_->update(this);
 }
