@@ -21,6 +21,9 @@ int createAndListen(const char* ip, int port)
 	listenfd = socket(PF_INET, SOCK_STREAM, 0);
 	assert(listenfd != -1);
 
+	int use = 1;
+	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &use, sizeof(use));
+
 	struct sockaddr_in svraddr;
 	svraddr.sin_family = AF_INET;
 	svraddr.sin_addr.s_addr = inet_addr(ip);

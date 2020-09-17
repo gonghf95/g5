@@ -8,6 +8,7 @@
 class Acceptor;
 class TcpConnection;
 class EventLoop;
+class INetCallback;
 class TcpServer : public IAcceptorCallback
 {
 public:
@@ -16,12 +17,15 @@ public:
 
 	void start();
 
+	void setNetCallback(INetCallback* cb) { callback_ = cb; }
+
 	/// inherit from IChannelCallback
 	void newConnection(int fd);
 
 private:
 	EventLoop* loop_;
 	Acceptor* acceptor_;
+	INetCallback* callback_;
 
 	std::map<int, TcpConnection*> connections_;
 };

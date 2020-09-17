@@ -14,9 +14,10 @@
 using namespace std;
 
 TcpServer::TcpServer(EventLoop* loop)
-	: loop_(loop)
+	: loop_(loop),
+	 acceptor_(new Acceptor(loop)),
+	 callback_(NULL)
 {
-	acceptor_ = new Acceptor(loop);
 	acceptor_->setCallback(this);
 }
 
