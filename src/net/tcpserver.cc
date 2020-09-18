@@ -35,7 +35,10 @@ void TcpServer::start()
 
 void TcpServer::newConnection(int fd)
 {
-	cout << "new connection: " << fd << endl;
 	TcpConnection* conn = new TcpConnection(loop_, fd);
+
+	if(callback_ != NULL)
+		conn->setNetCallback(callback_);
+
 	connections_[fd] = conn;
 }
