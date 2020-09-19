@@ -3,14 +3,14 @@
 #include "inetcallback.h"
 
 #include <unistd.h>
-#include <iostream>
+#include <string.h>
 
-using namespace std;
+using std::string;
 
 TcpConnection::TcpConnection(EventLoop* loop, int fd)
  : fd_(fd),
-  loop_(loop),
-  callback_(NULL)
+ callback_(NULL),
+ loop_(loop)
 {
 	channel_ = new Channel(loop_, fd_);
 	channel_->setCallback(this);
@@ -22,16 +22,28 @@ TcpConnection::~TcpConnection()
 	delete channel_;
 }
 
-void TcpConnection::onIn(int fd)
+void TcpConnection::handleRead()
 {
 	char buf[1024] = {0};
-	int nread = read(fd, buf, sizeof(buf));
+	int nread = read(fd_, buf, sizeof(buf));
+	if(nread <= 0)
+	{
+		if(nread == 0)
+		{
+			close(fd_);
+		}
+		else if(nread == -1)
+		{
+			fprintf(stderr, "err: %s\n", strerror(errno));
+		}
+		return;
+	}
 	string msg(buf, nread);
 	if(callback_ != NULL)
 		callback_->onMessage(this, msg);
 }
 
-void TcpConnection::setNetCallback(INetCallback* cb)
+void TcpConnection::setCallback(INetCallback* cb)
 {
 	callback_ = cb;
 	if(callback_ != NULL)

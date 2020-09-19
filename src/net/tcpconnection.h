@@ -14,18 +14,18 @@ public:
 	TcpConnection(EventLoop* loop, int fd);
 	virtual ~TcpConnection();
 
-	void setNetCallback(INetCallback* cb);
+	void setCallback(INetCallback* cb);
 
 	void send(const std::string& msg);
 
 protected:
-	virtual void onIn(int fd);
+	virtual void handleRead();
 
 private:
 	int fd_;
 	Channel* channel_;
-	EventLoop* loop_;
 	INetCallback* callback_;
+	EventLoop* loop_;
 };
 
 #endif

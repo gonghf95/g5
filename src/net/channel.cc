@@ -26,7 +26,7 @@ void Channel::setRevents(int events)
 void Channel::handleEvent()
 {
 	if(revents_ & EPOLLIN)
-		callback_->onIn(fd_);
+		callback_->handleRead();
 }
 
 void Channel::enableReading()

@@ -45,8 +45,8 @@ int createAndListen(const char* ip, int port)
 Acceptor::Acceptor(EventLoop* loop)
 	: listenfd_(-1), 
 	 channel_(NULL),
-	 loop_(loop),
-	 callback_(NULL)
+	 callback_(NULL),
+	 loop_(loop)
 {
 }
 
@@ -60,13 +60,15 @@ Acceptor::~Acceptor()
 	callback_ = NULL;
 }
 
-void Acceptor::onIn(int fd)
+void Acceptor::handleRead()
 {
 	struct sockaddr_in cliaddr;
 	socklen_t addrlen = sizeof(cliaddr);
 	int connfd = accept(listenfd_, (struct sockaddr*)&cliaddr, &addrlen);
 	assert(connfd != -1);
 
+	//
+	// set nonblocking
 	int flags = fcntl(connfd, F_GETFL);
 	flags |= O_NONBLOCK;
 	fcntl(connfd, F_SETFL, flags);

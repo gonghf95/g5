@@ -38,7 +38,7 @@ void TcpServer::newConnection(int fd)
 	TcpConnection* conn = new TcpConnection(loop_, fd);
 
 	if(callback_ != NULL)
-		conn->setNetCallback(callback_);
+		conn->setCallback(callback_);
 
 	connections_[fd] = conn;
 }

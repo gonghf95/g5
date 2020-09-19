@@ -16,14 +16,14 @@ public:
 
 	void start();
 
-	/// inherit from parent
-	virtual void onIn(int fd);
+protected:
+	virtual void handleRead();
 
 private:
 	int listenfd_;
 	Channel* channel_;
-	EventLoop* loop_;
 	IAcceptorCallback* callback_;
+	EventLoop* loop_;
 };
 
 #endif
