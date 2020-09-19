@@ -77,6 +77,10 @@ void Acceptor::handleRead()
 		callback_->newConnection(connfd);
 }
 
+void Acceptor::handleWrite()
+{
+}
+
 void Acceptor::start()
 {
 	listenfd_ = detail::createAndListen(kIP, kPort);

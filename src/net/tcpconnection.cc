@@ -43,6 +43,15 @@ void TcpConnection::handleRead()
 		callback_->onMessage(this, msg);
 }
 
+void TcpConnection::handleWrite()
+{
+	// FIXME: send msg from buffer
+	if(channel_->writable())
+	{
+	
+	}
+}
+
 void TcpConnection::setCallback(INetCallback* cb)
 {
 	callback_ = cb;
@@ -52,6 +61,11 @@ void TcpConnection::setCallback(INetCallback* cb)
 
 void TcpConnection::send(const string& msg)
 {
+	// FIXME: register EPOLLOUT event if it hasn't installing in epoll fd,
+	// and you should push msg into buffer rather than write data to fd.
+	if(!channel_->writable())
+		channel_->enableWriting(true);
+	
 	int len = msg.length();
 	int nwrite = write(fd_, msg.c_str(), len);
 	if(nwrite != len)

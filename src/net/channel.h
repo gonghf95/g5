@@ -16,9 +16,14 @@ public:
 	int fd() { return fd_; }
 	int events() { return events_; }
 
-	void enableReading();
+	void enableReading(bool enable = true);
+	void enableWriting(bool enable = true);
+
+	bool writable();
 
 private:
+	void update();
+
 	int fd_;
 	int events_;
 	int revents_;

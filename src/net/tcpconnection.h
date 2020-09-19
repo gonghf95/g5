@@ -20,6 +20,7 @@ public:
 
 protected:
 	virtual void handleRead();
+	virtual void handleWrite();
 
 private:
 	int fd_;
