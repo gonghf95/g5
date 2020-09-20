@@ -10,7 +10,9 @@ using std::string;
 TcpConnection::TcpConnection(EventLoop* loop, int fd)
  : fd_(fd),
  callback_(NULL),
- loop_(loop)
+ loop_(loop),
+ inBuf_(new string),
+ outBuf_(new string)
 {
 	channel_ = new Channel(loop_, fd_);
 	channel_->setCallback(this);
@@ -38,17 +40,22 @@ void TcpConnection::handleRead()
 		}
 		return;
 	}
-	string msg(buf, nread);
+	inBuf_->append(string(buf, nread));
 	if(callback_ != NULL)
-		callback_->onMessage(this, msg);
+		callback_->onMessage(this, inBuf_);
 }
 
 void TcpConnection::handleWrite()
 {
-	// FIXME: send msg from buffer
 	if(channel_->writable())
 	{
-	
+		int nwrite = write(fd_, outBuf_->c_str(), outBuf_->length());
+		if(nwrite > 0)
+		{
+			*outBuf_ = outBuf_->substr(nwrite, outBuf_->length());
+			if(outBuf_->empty())
+				channel_->enableWriting(false);
+		}
 	}
 }
 
@@ -61,13 +68,18 @@ void TcpConnection::setCallback(INetCallback* cb)
 
 void TcpConnection::send(const string& msg)
 {
-	// FIXME: register EPOLLOUT event if it hasn't installing in epoll fd,
-	// and you should push msg into buffer rather than write data to fd.
-	if(!channel_->writable())
-		channel_->enableWriting(true);
-	
-	int len = msg.length();
-	int nwrite = write(fd_, msg.c_str(), len);
-	if(nwrite != len)
-		fprintf(stderr, "total: %d, write bytes: %d\n", len, nwrite);
+	int nwrite = 0;
+	if(outBuf_->empty())
+	{
+		nwrite = write(fd_, msg.c_str(), msg.length());
+		if(nwrite == -1)
+			fprintf(stderr, "err: %d %s\n", errno, strerror(errno));
+	}
+
+	if(nwrite < static_cast<int>(msg.length()))
+	{
+		outBuf_->append(msg.substr(nwrite, msg.length()));
+		if(!channel_->writable())
+			channel_->enableWriting(true);
+	}
 }

@@ -27,6 +27,9 @@ private:
 	Channel* channel_;
 	INetCallback* callback_;
 	EventLoop* loop_;
+
+	std::string* inBuf_;
+	std::string* outBuf_;
 };
 
 #endif
