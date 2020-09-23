@@ -32,7 +32,7 @@ void EchoServer::onConnection(TcpConnection* conn)
 	cout << "new connection\n";
 }
 
-void EchoServer::onMessage(TcpConnection* conn, const string& msg)
+void EchoServer::onMessage(TcpConnection* conn, string& msg)
 {
 	cout << msg << endl;
 	conn->send(msg);

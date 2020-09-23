@@ -28,8 +28,8 @@ private:
 	INetCallback* callback_;
 	EventLoop* loop_;
 
-	std::string* inBuf_;
-	std::string* outBuf_;
+	std::string inBuf_;
+	std::string outBuf_;
 };
 
 #endif

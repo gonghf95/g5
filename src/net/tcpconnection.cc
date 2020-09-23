@@ -10,9 +10,7 @@ using std::string;
 TcpConnection::TcpConnection(EventLoop* loop, int fd)
  : fd_(fd),
  callback_(NULL),
- loop_(loop),
- inBuf_(new string),
- outBuf_(new string)
+ loop_(loop)
 {
 	channel_ = new Channel(loop_, fd_);
 	channel_->setCallback(this);
@@ -40,7 +38,7 @@ void TcpConnection::handleRead()
 		}
 		return;
 	}
-	inBuf_->append(string(buf, nread));
+	inBuf_.append(string(buf, nread));
 	if(callback_ != NULL)
 		callback_->onMessage(this, inBuf_);
 }
@@ -49,11 +47,11 @@ void TcpConnection::handleWrite()
 {
 	if(channel_->writable())
 	{
-		int nwrite = write(fd_, outBuf_->c_str(), outBuf_->length());
+		int nwrite = write(fd_, outBuf_.c_str(), outBuf_.length());
 		if(nwrite > 0)
 		{
-			*outBuf_ = outBuf_->substr(nwrite, outBuf_->length());
-			if(outBuf_->empty())
+			outBuf_ = outBuf_.substr(nwrite, outBuf_.length());
+			if(outBuf_.empty())
 				channel_->enableWriting(false);
 		}
 	}
@@ -69,7 +67,7 @@ void TcpConnection::setCallback(INetCallback* cb)
 void TcpConnection::send(const string& msg)
 {
 	int nwrite = 0;
-	if(outBuf_->empty())
+	if(outBuf_.empty())
 	{
 		nwrite = write(fd_, msg.c_str(), msg.length());
 		if(nwrite == -1)
@@ -78,7 +76,7 @@ void TcpConnection::send(const string& msg)
 
 	if(nwrite < static_cast<int>(msg.length()))
 	{
-		outBuf_->append(msg.substr(nwrite, msg.length()));
+		outBuf_.append(msg.substr(nwrite, msg.length()));
 		if(!channel_->writable())
 			channel_->enableWriting(true);
 	}

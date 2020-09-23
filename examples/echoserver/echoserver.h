@@ -20,7 +20,7 @@ public:
 
 protected:
 	void onConnection(TcpConnection* conn);
-	void onMessage(TcpConnection* conn, const string& msg);
+	void onMessage(TcpConnection* conn, string& msg);
 
 private:
 	EventLoop* loop_;
