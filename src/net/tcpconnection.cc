@@ -47,12 +47,14 @@ void TcpConnection::handleWrite()
 {
 	if(channel_->writable())
 	{
-		int nwrite = write(fd_, outBuf_.c_str(), outBuf_.length());
+		int nwrite = write(fd_, outBuf_.peek(), outBuf_.readableBytes());
 		if(nwrite > 0)
 		{
-			outBuf_ = outBuf_.substr(nwrite, outBuf_.length());
-			if(outBuf_.empty())
+			outBuf_.retrieve(nwrite);
+			if(outBuf_.readableBytes() <= 0)
+			{
 				channel_->enableWriting(false);
+			}
 		}
 	}
 }
@@ -67,7 +69,7 @@ void TcpConnection::setCallback(INetCallback* cb)
 void TcpConnection::send(const string& msg)
 {
 	int nwrite = 0;
-	if(outBuf_.empty())
+	if(outBuf_.readableBytes() <= 0)
 	{
 		nwrite = write(fd_, msg.c_str(), msg.length());
 		if(nwrite == -1)

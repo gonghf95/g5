@@ -2,6 +2,7 @@
 #define TCPCONNECTION_H
 
 #include "ichannelcallback.h"
+#include "buffer.h"
 
 #include <string>
 
@@ -28,8 +29,8 @@ private:
 	INetCallback* callback_;
 	EventLoop* loop_;
 
-	std::string inBuf_;
-	std::string outBuf_;
+	Buffer inBuf_;
+	Buffer outBuf_;
 };
 
 #endif
