@@ -7,6 +7,7 @@
 
 using std::string;
 
+class Buffer;
 class EventLoop;
 class TcpServer;
 class TcpConnection;
@@ -20,7 +21,8 @@ public:
 
 protected:
 	void onConnection(TcpConnection* conn);
-	void onMessage(TcpConnection* conn, string& msg);
+	void onMessage(TcpConnection* conn, Buffer& msg);
+	void onWriteComplete();
 
 private:
 	EventLoop* loop_;

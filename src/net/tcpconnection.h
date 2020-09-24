@@ -1,15 +1,16 @@
 #ifndef TCPCONNECTION_H
 #define TCPCONNECTION_H
 
-#include "ichannelcallback.h"
 #include "buffer.h"
+#include "ichannelcallback.h"
+#include "iruncallback.h"
 
 #include <string>
 
 class Channel;
 class EventLoop;
 class INetCallback;
-class TcpConnection : public IChannelCallback
+class TcpConnection : public IChannelCallback, public IRunCallback
 {
 public:
 	TcpConnection(EventLoop* loop, int fd);
@@ -22,6 +23,7 @@ public:
 protected:
 	virtual void handleRead();
 	virtual void handleWrite();
+	virtual void run();
 
 private:
 	int fd_;

@@ -32,8 +32,14 @@ void EchoServer::onConnection(TcpConnection* conn)
 	cout << "new connection\n";
 }
 
-void EchoServer::onMessage(TcpConnection* conn, string& msg)
+void EchoServer::onMessage(TcpConnection* conn, Buffer& buf)
 {
+	string msg = buf.retrieveAllAsString();
 	cout << msg << endl;
 	conn->send(msg);
+}
+
+void EchoServer::onWriteComplete()
+{
+	cout << "write complete\n";
 }

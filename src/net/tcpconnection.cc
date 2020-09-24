@@ -1,6 +1,7 @@
 #include "tcpconnection.h"
 #include "channel.h"
 #include "inetcallback.h"
+#include "eventloop.h"
 
 #include <unistd.h>
 #include <string.h>
@@ -54,8 +55,17 @@ void TcpConnection::handleWrite()
 			if(outBuf_.readableBytes() <= 0)
 			{
 				channel_->enableWriting(false);
+				loop_->queueInLoop(this);
 			}
 		}
+	}
+}
+
+void TcpConnection::run()
+{
+	if(callback_!=NULL)
+	{
+		callback_->onWriteComplete();
 	}
 }
 
@@ -73,7 +83,13 @@ void TcpConnection::send(const string& msg)
 	{
 		nwrite = write(fd_, msg.c_str(), msg.length());
 		if(nwrite == -1)
+		{
 			fprintf(stderr, "err: %d %s\n", errno, strerror(errno));
+		}
+		else if(nwrite == static_cast<int>(msg.length()))
+		{
+			loop_->queueInLoop(this);
+		}
 	}
 
 	if(nwrite < static_cast<int>(msg.length()))
