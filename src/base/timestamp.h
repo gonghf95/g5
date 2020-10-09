@@ -70,4 +70,10 @@ inline bool operator==(Timestamp lhs, Timestamp rhs)
 	return lhs.microSecondsSinceEpoch_ == rhs.microSecondsSinceEpoch_;
 }
 
+inline Timestamp addTime(const Timestamp& ts, int interval)
+{
+	int64_t delta = static_cast<int64_t>(interval * Timestamp::kMicroSecondsPerSecond);
+	return Timestamp(ts.microSecondsSinceEpoch() + delta);
+}
+
 #endif
