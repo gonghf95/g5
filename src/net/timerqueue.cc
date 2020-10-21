@@ -27,6 +27,14 @@ int TimerQueue::createTimerFd()
 	return timerfd;
 }
 
+int TimerQueue::addTimer(IRunCallback* cb, Timestamp when, int interval)
+{
+	Timer* timer = new Timer(when, interval, cb);
+	loop_->queueInLoop(cb, timer);
+	//return timer;
+	return -1;  // FIXME: 
+}
+
 void TimerQueue::handleRead()
 {
 }

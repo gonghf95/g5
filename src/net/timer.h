@@ -18,7 +18,7 @@ public:
 
 	void run() const
 	{
-		callback_->run();
+		callback_->run((void*)this);
 	}
 
 	Timestamp expiration() const { return expiration_; }

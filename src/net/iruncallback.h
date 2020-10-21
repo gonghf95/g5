@@ -4,7 +4,7 @@
 class IRunCallback
 {
 public:
-	virtual void run() = 0;
+	virtual void run(void* param) = 0;
 };
 
 #endif

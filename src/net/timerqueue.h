@@ -16,6 +16,8 @@ public:
 	TimerQueue(EventLoop* loop);
 	virtual ~TimerQueue();
 
+	int addTimer(IRunCallback* cb, Timestamp when, int interval);
+
 protected:
 	virtual void handleRead();
 	virtual void handleWrite();
@@ -27,6 +29,7 @@ private:
 	int createTimerFd();
 
 	int timerFd_;
+	TimerList timers_;
 	Channel* channel_;
 	EventLoop* loop_;
 };

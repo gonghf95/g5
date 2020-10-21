@@ -59,21 +59,22 @@ void EventLoop::update(Channel* channel)
 	poller_->update(channel);
 }
 
-void EventLoop::queueInLoop(IRunCallback* cb)
+void EventLoop::queueInLoop(IRunCallback* cb, void* param)
 {
-	pendingFunctors_.push_back(cb);
+	Runner runner(cb, param);
+	pendingFunctors_.push_back(runner);
 	wakeup();
 }
 
 void EventLoop::doPendingFunctors()
 {
-	vector<IRunCallback*> functors;
+	vector<Runner> functors;
 	functors.swap(pendingFunctors_);
 	
-	vector<IRunCallback*>::iterator it;
+	vector<Runner>::iterator it;
 	for(it=functors.begin();it!=functors.end();it++)
 	{
-		(*it)->run();
+		(*it).run();
 	}
 }
 

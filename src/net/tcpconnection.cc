@@ -55,13 +55,13 @@ void TcpConnection::handleWrite()
 			if(outBuf_.readableBytes() <= 0)
 			{
 				channel_->enableWriting(false);
-				loop_->queueInLoop(this);
+				loop_->queueInLoop(this, NULL);
 			}
 		}
 	}
 }
 
-void TcpConnection::run()
+void TcpConnection::run(void* param)
 {
 	if(callback_!=NULL)
 	{
@@ -88,7 +88,7 @@ void TcpConnection::send(const string& msg)
 		}
 		else if(nwrite == static_cast<int>(msg.length()))
 		{
-			loop_->queueInLoop(this);
+			loop_->queueInLoop(this, NULL);
 		}
 	}
 
