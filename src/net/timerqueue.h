@@ -27,6 +27,9 @@ private:
 	typedef std::set<Entry> TimerList;
 
 	int createTimerFd();
+	void readTimerFd();
+	std::vector<Entry> getExpired(Timestamp now);
+	void reset(const std::vector<Entry>& expired, Timestamp now);
 
 	int timerFd_;
 	TimerList timers_;

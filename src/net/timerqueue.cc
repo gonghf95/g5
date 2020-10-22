@@ -4,6 +4,11 @@
 
 #include <assert.h>
 #include <sys/timerfd.h>
+#include <unistd.h>
+#include <iostream>
+
+using std::cout;
+using std::vector;
 
 TimerQueue::TimerQueue(EventLoop* loop)
 	: loop_(loop)
@@ -37,8 +42,43 @@ int TimerQueue::addTimer(IRunCallback* cb, Timestamp when, int interval)
 
 void TimerQueue::handleRead()
 {
+	// read bytes
+	readTimerFd();
+
+	// get expired timer and run the callback
+	Timestamp now(Timestamp::now());
+	vector<TimerQueue::Entry> expired = getExpired(now);
+	vector<TimerQueue::Entry>::iterator it;
+	for(it = expired.begin(); it != expired.end(); ++it)
+	{
+		it->second->run();
+	}
+
+	// reset the timer
+	reset(expired, now);
 }
 
 void TimerQueue::handleWrite()
 {
+}
+
+void TimerQueue::readTimerFd()
+{
+	uint64_t one = 1;
+	size_t n = ::read(timerFd_, &one, sizeof(one));
+	if(n != sizeof(one))
+	{
+		cout << "TimerQueue::handleRead() reads " << n << " bytes instead of 8\n";
+	}
+}
+
+vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
+{
+
+	return {};
+}
+
+void TimerQueue::reset(const vector<Entry>& expired, Timestamp now)
+{
+
 }
