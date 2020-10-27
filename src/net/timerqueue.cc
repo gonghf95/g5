@@ -82,3 +82,39 @@ void TimerQueue::reset(const vector<Entry>& expired, Timestamp now)
 {
 
 }
+
+void TimerQueue::doAddTimer(void* param)
+{
+	Timer* timer = static_cast<Timer*>(param);
+
+	bool earliestChanged = insert(timer);
+	if(earliestChanged)
+	{
+		resetTimerFd(timerFd_, timer->expiration());
+	}
+}
+
+bool TimerQueue::insert(Timer* timer)
+{
+	bool earliestChanged = false;
+	
+	Timestamp when = timer->expiration();
+	TimerList::iterator it = timers_.begin();
+	if(it==timers_.end() || when < it->first)
+	{
+		earliestChanged = true;
+	}
+
+	std::pair<TimerList::iterator, bool> result = timers_.insert(Entry(when, timer));
+	if(!result.second)
+	{
+		cout << "TimerQueue::insert error.\n";
+	}
+
+	return earliestChanged;
+}
+
+void TimerQueue::resetTimerFd(int timerfd, Timestamp when)
+{
+
+}
