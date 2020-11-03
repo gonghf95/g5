@@ -50,6 +50,7 @@ private:
 	void doAddTimer(void* timer);
 	bool insert(Timer* timer);
 	void resetTimerFd(int timerfd, Timestamp when);
+	struct timespec howMuchTimeFromNow(Timestamp when);
 
 	int timerFd_;
 	TimerList timers_;

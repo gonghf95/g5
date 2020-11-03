@@ -6,6 +6,7 @@
 #include <sys/timerfd.h>
 #include <unistd.h>
 #include <iostream>
+#include <string.h>
 
 using std::cout;
 using std::vector;
@@ -74,13 +75,37 @@ void TimerQueue::readTimerFd()
 
 vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
 {
-
-	return {};
+	vector<Entry> expired;
+	Entry sentry(now, reinterpret_cast<Timer*>(UINTPTR_MAX));
+	TimerList::iterator end = timers_.lower_bound(sentry);
+	copy(timers_.begin(), end, back_inserter(expired));
+	timers_.erase(timers_.begin(), end);
+	return expired;
 }
 
 void TimerQueue::reset(const vector<Entry>& expired, Timestamp now)
 {
+	vector<Entry>::const_iterator it;
+	for(it=expired.begin(); it!=expired.end(); ++it)
+	{
+		if(it->second->repeat())
+		{
+			it->second->restart(Timestamp::now());
+			insert(it->second);
+		}
+	}
 
+	//
+	Timestamp next_timestamp;
+	if(!timers_.empty())
+	{
+		Timestamp next_timestamp;
+		next_timestamp = timers_.begin()->second->expiration();
+		if(next_timestamp.valid())
+		{
+			resetTimerFd(timerFd_, next_timestamp);
+		}
+	}
 }
 
 void TimerQueue::doAddTimer(void* param)
@@ -108,7 +133,7 @@ bool TimerQueue::insert(Timer* timer)
 	std::pair<TimerList::iterator, bool> result = timers_.insert(Entry(when, timer));
 	if(!result.second)
 	{
-		cout << "TimerQueue::insert error.\n";
+		cout << "TimerQueue::insert() error.\n";
 	}
 
 	return earliestChanged;
@@ -116,5 +141,26 @@ bool TimerQueue::insert(Timer* timer)
 
 void TimerQueue::resetTimerFd(int timerfd, Timestamp when)
 {
+	struct itimerspec newVal;
+	struct itimerspec oldVal;
+	bzero(&newVal, sizeof(newVal));
+	bzero(&oldVal, sizeof(oldVal));
+	newVal.it_value = howMuchTimeFromNow(when);
+	int ret = ::timerfd_settime(timerFd_, 0, &newVal, &oldVal);
+	if(ret)
+	{
+		cout << "TimerQueue::resetTimerFd() error\n";
+	}
+}
 
+struct timespec TimerQueue::howMuchTimeFromNow(Timestamp when)
+{
+	int64_t microseconds = when.microSecondsSinceEpoch() - Timestamp::now().microSecondsSinceEpoch();
+	if(microseconds < 100)
+		microseconds = 100;
+
+	struct timespec ts;
+	ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicroSecondsPerSecond);
+	ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicroSecondsPerSecond) * 1000);
+	return ts;
 }
