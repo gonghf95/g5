@@ -2,6 +2,7 @@
 #include "epoller.h"
 #include "channel.h"
 #include "iruncallback.h"
+#include "timerqueue.h"
 
 #include <unistd.h>
 #include <sys/eventfd.h>
@@ -24,7 +25,8 @@ int createEventFd()
 
 EventLoop::EventLoop()
 	: quit_(false),
-	 poller_(new Epoller)
+	 poller_(new Epoller),
+	 timerQueue_(new TimerQueue(this))
 {
 	eventfd_ = detail::createEventFd();
 	channel_ = new Channel(this, eventfd_);
@@ -102,4 +104,21 @@ void EventLoop::handleRead()
 void EventLoop::handleWrite()
 {
 
+}
+
+int EventLoop::runAt(Timestamp when, IRunCallback* cb)
+{
+	return timerQueue_->addTimer(cb, when, 0.0);
+}
+
+int EventLoop::runAfter(double delay, IRunCallback* cb)
+{
+	Timestamp when = addTime(Timestamp::now(), delay);
+	return timerQueue_->addTimer(cb, when, 0.0);
+}
+
+int EventLoop::runEvery(double interval, IRunCallback* cb)
+{
+	Timestamp when = addTime(Timestamp::now(), interval);
+	return timerQueue_->addTimer(cb, when, interval);
 }
