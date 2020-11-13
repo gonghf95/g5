@@ -19,6 +19,8 @@ TimerQueue::TimerQueue(EventLoop* loop)
 	channel_ = new Channel(loop_, timerFd_);
 	channel_->setCallback(this);
 	channel_->enableReading();
+
+	addTimerWrapper_ = new TimerQueue::AddTimerWrapper(this);
 }
 
 TimerQueue::~TimerQueue()
@@ -36,7 +38,7 @@ int TimerQueue::createTimerFd()
 int TimerQueue::addTimer(IRunCallback* cb, Timestamp when, int interval)
 {
 	Timer* timer = new Timer(when, interval, cb);
-	loop_->queueInLoop(cb, timer);
+	loop_->queueInLoop(addTimerWrapper_, timer);
 	//return timer;
 	return -1;  // FIXME: 
 }
