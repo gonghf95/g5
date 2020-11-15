@@ -1,3 +1,16 @@
+2020-11-14 hongfu <1342735006@qq.com>
+
+	* 当前阶段学习内容
+		1. 单线程的rector模型完成
+		2. 任务调度
+	* 存在问题
+		1. 并没有关注内存释放问题
+		2. 部分接口没有实现
+	* 下一阶段内容
+		1. 当前版本是根据mini-muduo博客写的， 主要是为了了解整个muduo类结构。下一个版本是往muduo接口上靠近，
+		改成functional、bind实现。
+		2. 引入多线程
+
 2020-08-29 hongfu <1342735006@qq.com>
 	
 	* adjust project structure.
