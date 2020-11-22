@@ -21,7 +21,7 @@ void Epoller::poll(vector<Channel*>& channels)
 	for(int i=0; i<nready; ++i)
 	{
 		Channel* ch = static_cast<Channel*>(events_[i].data.ptr);
-		ch->setRevents(events_[i].events);
+		ch->set_revents(events_[i].events);
 		channels.push_back(ch);
 	}
 }

@@ -19,10 +19,11 @@ public:
 
 	void setNetCallback(INetCallback* cb) { callback_ = cb; }
 
-	/// inherit from IChannelCallback
 	void newConnection(int fd);
 
 private:
+	typedef shared_ptr<Acceptor> AcceptorPtr;
+
 	EventLoop* loop_;
 	Acceptor* acceptor_;
 	INetCallback* callback_;

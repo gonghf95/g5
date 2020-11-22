@@ -1,16 +1,15 @@
 #ifndef TCPCONNECTION_H
 #define TCPCONNECTION_H
 
-#include "buffer.h"
-#include "ichannelcallback.h"
-#include "iruncallback.h"
-
+#include "Buffer.h"
 #include <string>
+
+namespace net
+{
 
 class Channel;
 class EventLoop;
-class INetCallback;
-class TcpConnection : public IChannelCallback, public IRunCallback
+class TcpConnection
 {
 public:
 	TcpConnection(EventLoop* loop, int fd);
@@ -34,5 +33,7 @@ private:
 	Buffer inBuf_;
 	Buffer outBuf_;
 };
+
+} // namespace net
 
 #endif

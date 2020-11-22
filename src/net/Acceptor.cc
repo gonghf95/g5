@@ -42,22 +42,19 @@ int createAndListen(const char* ip, int port)
 
 } // namespace detail
 
+using namespace net;
+
 Acceptor::Acceptor(EventLoop* loop)
-	: listenfd_(-1), 
-	 channel_(NULL),
-	 callback_(NULL),
-	 loop_(loop)
+	: loop_(loop), 
+	listenfd_(detail::createAndListen(kIP, kPort)),
+	channel_(loop, listenfd_)
 {
+	channel_.setReadEventCallback(std::bind(&Acceptor::handleRead, this));
 }
 
 Acceptor::~Acceptor()
 {
-	if(channel_ != NULL)
-		delete channel_;
-	if(callback_ != NULL)
-		delete callback_;
-	channel_ = NULL;
-	callback_ = NULL;
+	::close(listenfd_);
 }
 
 void Acceptor::handleRead()
@@ -67,24 +64,14 @@ void Acceptor::handleRead()
 	int connfd = accept(listenfd_, (struct sockaddr*)&cliaddr, &addrlen);
 	assert(connfd != -1);
 
-	//
-	// set nonblocking
 	int flags = fcntl(connfd, F_GETFL);
 	flags |= O_NONBLOCK;
 	fcntl(connfd, F_SETFL, flags);
 
-	if(callback_!=NULL)
-		callback_->newConnection(connfd);
+	newConnectionCallback(connfd);
 }
 
-void Acceptor::handleWrite()
+void Acceptor::listen()
 {
-}
-
-void Acceptor::start()
-{
-	listenfd_ = detail::createAndListen(kIP, kPort);
-	channel_ = new Channel(loop_, listenfd_);
-	channel_->setCallback(this);
-	channel_->enableReading();
+	channel_.enableReading();
 }

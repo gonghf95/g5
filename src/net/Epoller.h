@@ -1,8 +1,11 @@
 #ifndef EPOLLER_H
 #define EPOLLER_H
 
-#include <sys/epoll.h>
 #include <vector>
+#include <sys/epoll.h>
+
+namespace net
+{
 
 #define MAXEVENTS 1024
 
@@ -20,5 +23,7 @@ private:
 	int epfd_;
 	struct epoll_event events_[MAXEVENTS];
 };
+
+} // namespace net
 
 #endif

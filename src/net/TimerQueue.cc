@@ -8,47 +8,92 @@
 #include <iostream>
 #include <string.h>
 
-using std::cout;
-using std::vector;
-
-TimerQueue::TimerQueue(EventLoop* loop)
-	: loop_(loop)
+namespace net
 {
-	timerFd_ = createTimerFd();
 
-	channel_ = new Channel(loop_, timerFd_);
-	channel_->setCallback(this);
-	channel_->enableReading();
-
-	addTimerWrapper_ = new TimerQueue::AddTimerWrapper(this);
-}
-
-TimerQueue::~TimerQueue()
+namespace detail
 {
-	delete channel_;
-}
 
-int TimerQueue::createTimerFd()
+int createTimerfd()
 {
 	int timerfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK|TFD_CLOEXEC);
 	assert(timerfd != -1);
 	return timerfd;
 }
 
-int TimerQueue::addTimer(IRunCallback* cb, Timestamp when, int interval)
+struct timespec howMuchTimeFromNow(Timestamp when)
 {
-	Timer* timer = new Timer(when, interval, cb);
-	loop_->queueInLoop(addTimerWrapper_, timer);
-	//return timer;
-	return -1;  // FIXME: 
+	int64_t microseconds = when.microSecondsSinceEpoch() - Timestamp::now().microSecondsSinceEpoch();
+	if(microseconds < 100)
+		microseconds = 100;
+
+	struct timespec ts;
+	ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicroSecondsPerSecond);
+	ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicroSecondsPerSecond) * 1000);
+	return ts;
+}
+
+void readTimerfd(int timerfd)
+{
+	uint64_t one = 1;
+	size_t n = ::read(timerfd, &one, sizeof(one));
+	if(n != sizeof(one))
+	{
+		cout << "TimerQueue::handleRead() reads " << n << " bytes instead of 8\n";
+	}
+}
+
+void resetTimerFd(int timerfd, Timestamp when)
+{
+	struct itimerspec newVal;
+	struct itimerspec oldVal;
+	bzero(&newVal, sizeof(newVal));
+	bzero(&oldVal, sizeof(oldVal));
+	newVal.it_value = howMuchTimeFromNow(when);
+	int ret = ::timerfd_settime(timerFd_, 0, &newVal, &oldVal);
+	if(ret)
+	{
+		cout << "TimerQueue::resetTimerFd() error\n";
+	}
+}
+
+} // namespace detail
+
+} // namespace net
+
+
+using std::cout;
+using std::vector;
+using net::detail;
+
+
+TimerQueue::TimerQueue(EventLoop* loop)
+	: loop_(loop),
+	timerfd_(createTimerfd()),
+	channel_(new Channel(loop_, timerfd_))
+{
+	channel_->setCallback(this);
+	channel_->enableReading();
+}
+
+TimerQueue::~TimerQueue()
+{
+	close(timerfd_);
+
+	delete channel_;
+}
+
+int TimerQueue::addTimer(TimerCallback cb, Timestamp when, int interval)
+{
+	Timer* timer = new Timer(std::move(cb), when, interval);
+	loop_->queueInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
+	return -1; // FIXME:
 }
 
 void TimerQueue::handleRead()
 {
-	// read bytes
-	readTimerFd();
+	readTimerfd(timerfd_);
 
-	// get expired timer and run the callback
 	Timestamp now(Timestamp::now());
 	vector<TimerQueue::Entry> expired = getExpired(now);
 	vector<TimerQueue::Entry>::iterator it;
@@ -57,21 +102,15 @@ void TimerQueue::handleRead()
 		it->second->run();
 	}
 
-	// reset the timer
 	reset(expired, now);
 }
 
-void TimerQueue::handleWrite()
+void TimerQueue::addTimerInLoop(Timer* timer)
 {
-}
-
-void TimerQueue::readTimerFd()
-{
-	uint64_t one = 1;
-	size_t n = ::read(timerFd_, &one, sizeof(one));
-	if(n != sizeof(one))
+	bool earliestChanged = insert(timer);
+	if(earliestChanged)
 	{
-		cout << "TimerQueue::handleRead() reads " << n << " bytes instead of 8\n";
+		resetTimerfd(timerFd_, timer->expiration());
 	}
 }
 
@@ -110,17 +149,6 @@ void TimerQueue::reset(const vector<Entry>& expired, Timestamp now)
 	}
 }
 
-void TimerQueue::doAddTimer(void* param)
-{
-	Timer* timer = static_cast<Timer*>(param);
-
-	bool earliestChanged = insert(timer);
-	if(earliestChanged)
-	{
-		resetTimerFd(timerFd_, timer->expiration());
-	}
-}
-
 bool TimerQueue::insert(Timer* timer)
 {
 	bool earliestChanged = false;
@@ -139,30 +167,4 @@ bool TimerQueue::insert(Timer* timer)
 	}
 
 	return earliestChanged;
-}
-
-void TimerQueue::resetTimerFd(int timerfd, Timestamp when)
-{
-	struct itimerspec newVal;
-	struct itimerspec oldVal;
-	bzero(&newVal, sizeof(newVal));
-	bzero(&oldVal, sizeof(oldVal));
-	newVal.it_value = howMuchTimeFromNow(when);
-	int ret = ::timerfd_settime(timerFd_, 0, &newVal, &oldVal);
-	if(ret)
-	{
-		cout << "TimerQueue::resetTimerFd() error\n";
-	}
-}
-
-struct timespec TimerQueue::howMuchTimeFromNow(Timestamp when)
-{
-	int64_t microseconds = when.microSecondsSinceEpoch() - Timestamp::now().microSecondsSinceEpoch();
-	if(microseconds < 100)
-		microseconds = 100;
-
-	struct timespec ts;
-	ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicroSecondsPerSecond);
-	ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicroSecondsPerSecond) * 1000);
-	return ts;
 }

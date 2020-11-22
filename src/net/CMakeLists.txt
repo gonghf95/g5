@@ -1,6 +1,6 @@
 set(net_SRCS
- timerqueue.cc
- timer.cc
+ TimerQueue.cc
+ Timer.cc
  buffer.cc
  eventloop.cc
  epoller.cc
