@@ -3,7 +3,7 @@
 
 #include "src/net/ichannelcallback.h"
 #include "src/net/Timer.h"
-#include "src/base/timestamp.h"
+#include "src/base/Timestamp.h"
 #include "src/net/Callbacks.h"
 
 #include <vector>

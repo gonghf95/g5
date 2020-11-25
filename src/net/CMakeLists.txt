@@ -1,13 +1,13 @@
 set(net_SRCS
  TimerQueue.cc
  Timer.cc
- buffer.cc
- eventloop.cc
- epoller.cc
- tcpconnection.cc
- acceptor.cc
- channel.cc
- tcpserver.cc
+ Buffer.cc
+ EventLoop.cc
+ Epoller.cc
+ TcpConnection.cc
+ Acceptor.cc
+ Channel.cc
+ TcpServer.cc
 )
 
 add_library(g5_net ${net_SRCS})

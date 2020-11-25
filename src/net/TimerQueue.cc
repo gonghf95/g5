@@ -1,6 +1,6 @@
-#include "src/net/timerqueue.h"
-#include "src/net/channel.h"
-#include "src/net/eventloop.h"
+#include "src/net/TimerQueue.h"
+#include "src/net/Channel.h"
+#include "src/net/EventLoop.h"
 
 #include <assert.h>
 #include <sys/timerfd.h>
