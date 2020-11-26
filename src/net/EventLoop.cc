@@ -1,8 +1,7 @@
-#include "eventloop.h"
-#include "epoller.h"
-#include "channel.h"
-#include "iruncallback.h"
-#include "timerqueue.h"
+#include "src/net/EventLoop.h"
+#include "src/net/Epoller.h"
+#include "src/net/Channel.h"
+#include "src/net/TimerQueue.h"
 
 #include <unistd.h>
 #include <sys/eventfd.h>
@@ -12,8 +11,12 @@
 using std::cout;
 using std::vector;
 
+namespace net
+{
+
 namespace detail
 {
+
 int createEventFd()
 {
 	int fd;
@@ -21,22 +24,31 @@ int createEventFd()
 	assert(fd != -1);
 	return fd;
 }
+
 } // namespace detail
+
+} // namespace net
+
+using namespace net;
+using namespace net::detail;
 
 EventLoop::EventLoop()
 	: quit_(false),
 	 poller_(new Epoller),
+	 eventfd_(detail::createEventFd()),
+	 channel_(this, eventfd_),
 	 timerQueue_(new TimerQueue(this))
 {
-	eventfd_ = detail::createEventFd();
-	channel_ = new Channel(this, eventfd_);
-	channel_->setCallback(this);
-	channel_->enableReading(true);
+	channel_.setReadCallback(std::bind(&EventLoop::handleRead, this));
+	channel_.enableReading();
 }
 
 EventLoop::~EventLoop()
 {
+	close(eventfd_);
+
 	delete poller_;
+	delete timerQueue_;
 }
 
 void EventLoop::loop()
@@ -61,22 +73,21 @@ void EventLoop::update(Channel* channel)
 	poller_->update(channel);
 }
 
-void EventLoop::queueInLoop(IRunCallback* cb, void* param)
+void EventLoop::queueInLoop(Functor cb)
 {
-	Runner runner(cb, param);
-	pendingFunctors_.push_back(runner);
+	pendingFunctors_.push_back(std::move(cb));
 	wakeup();
 }
 
 void EventLoop::doPendingFunctors()
 {
-	vector<Runner> functors;
+	vector<Functor> functors;
 	functors.swap(pendingFunctors_);
 	
-	vector<Runner>::iterator it;
+	vector<Functor>::iterator it;
 	for(it=functors.begin();it!=functors.end();it++)
 	{
-		(*it).run();
+		(*it)();
 	}
 }
 
@@ -101,23 +112,18 @@ void EventLoop::handleRead()
 	}
 }
 
-void EventLoop::handleWrite()
-{
-
-}
-
-int EventLoop::runAt(Timestamp when, IRunCallback* cb)
+int EventLoop::runAt(Timestamp when, TimerCallback cb)
 {
 	return timerQueue_->addTimer(cb, when, 0.0);
 }
 
-int EventLoop::runAfter(double delay, IRunCallback* cb)
+int EventLoop::runAfter(double delay, TimerCallback cb)
 {
 	Timestamp when = addTime(Timestamp::now(), delay);
 	return timerQueue_->addTimer(cb, when, 0.0);
 }
 
-int EventLoop::runEvery(double interval, IRunCallback* cb)
+int EventLoop::runEvery(double interval, TimerCallback cb)
 {
 	Timestamp when = addTime(Timestamp::now(), interval);
 	return timerQueue_->addTimer(cb, when, interval);

@@ -1,5 +1,4 @@
 #include "src/net/TimerQueue.h"
-#include "src/net/Channel.h"
 #include "src/net/EventLoop.h"
 
 #include <assert.h>
@@ -7,6 +6,10 @@
 #include <unistd.h>
 #include <iostream>
 #include <string.h>
+
+using std::cout;
+using std::endl;
+using std::vector;
 
 namespace net
 {
@@ -43,14 +46,14 @@ void readTimerfd(int timerfd)
 	}
 }
 
-void resetTimerFd(int timerfd, Timestamp when)
+void resetTimerfd(int timerfd, Timestamp when)
 {
 	struct itimerspec newVal;
 	struct itimerspec oldVal;
 	bzero(&newVal, sizeof(newVal));
 	bzero(&oldVal, sizeof(oldVal));
 	newVal.it_value = howMuchTimeFromNow(when);
-	int ret = ::timerfd_settime(timerFd_, 0, &newVal, &oldVal);
+	int ret = ::timerfd_settime(timerfd, 0, &newVal, &oldVal);
 	if(ret)
 	{
 		cout << "TimerQueue::resetTimerFd() error\n";
@@ -61,26 +64,21 @@ void resetTimerFd(int timerfd, Timestamp when)
 
 } // namespace net
 
-
-using std::cout;
-using std::vector;
-using net::detail;
-
+using namespace net;
+using namespace net::detail;
 
 TimerQueue::TimerQueue(EventLoop* loop)
 	: loop_(loop),
 	timerfd_(createTimerfd()),
-	channel_(new Channel(loop_, timerfd_))
+	channel_(loop_, timerfd_)
 {
-	channel_->setCallback(this);
-	channel_->enableReading();
+	channel_.setReadCallback(std::bind(&TimerQueue::handleRead, this));
+	channel_.enableReading();
 }
 
 TimerQueue::~TimerQueue()
 {
 	close(timerfd_);
-
-	delete channel_;
 }
 
 int TimerQueue::addTimer(TimerCallback cb, Timestamp when, int interval)
@@ -110,7 +108,7 @@ void TimerQueue::addTimerInLoop(Timer* timer)
 	bool earliestChanged = insert(timer);
 	if(earliestChanged)
 	{
-		resetTimerfd(timerFd_, timer->expiration());
+		resetTimerfd(timerfd_, timer->expiration());
 	}
 }
 
@@ -144,7 +142,7 @@ void TimerQueue::reset(const vector<Entry>& expired, Timestamp now)
 		next_timestamp = timers_.begin()->second->expiration();
 		if(next_timestamp.valid())
 		{
-			resetTimerFd(timerFd_, next_timestamp);
+			resetTimerfd(timerfd_, next_timestamp);
 		}
 	}
 }

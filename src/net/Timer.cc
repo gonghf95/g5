@@ -1,4 +1,7 @@
-#include "src/net/timer.h"
+#include "src/net/Timer.h"
+
+namespace net
+{
 
 void Timer::restart(Timestamp now)
 {
@@ -10,4 +13,6 @@ void Timer::restart(Timestamp now)
 	{
 		expiration_ = Timestamp::invalid();
 	}
+}
+
 }

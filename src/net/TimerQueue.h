@@ -5,6 +5,7 @@
 #include "src/net/Timer.h"
 #include "src/base/Timestamp.h"
 #include "src/net/Callbacks.h"
+#include "src/net/Channel.h"
 
 #include <vector>
 #include <set>
@@ -14,7 +15,7 @@ namespace net
 
 class Channel;
 class EventLoop;
-class TimerQueue : public IChannelCallback
+class TimerQueue
 {
 public:
 	TimerQueue(EventLoop* loop);
@@ -36,7 +37,7 @@ private:
 
 	EventLoop* loop_;
 	int timerfd_;
-	Channel* channel_;
+	Channel channel_;
 	TimerList timers_;
 };
 

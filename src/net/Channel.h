@@ -10,11 +10,10 @@ namespace net
 {
 
 class EventLoop;
-class IChannelCallback;
 class Channel
 {
 public:
-	typedef std::function<void (Timestamp)> ReadEventCallback;
+	typedef std::function<void ()> ReadEventCallback;
 	typedef std::function<void ()> WriteEventCallback;
 
 	Channel(EventLoop* loop, int fd);

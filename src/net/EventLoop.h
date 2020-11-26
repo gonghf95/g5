@@ -1,36 +1,21 @@
 #ifndef EVENTLOOP_H
 #define EVENTLOOP_H
 
-#include "ichannelcallback.h"
-#include "iruncallback.h"
-#include "src/base/Timestamp.h"
+#include "src/net/Channel.h"
+#include "src/net/Callbacks.h"
 
 #include <vector>
+
+namespace net
+{
 
 class Epoller;
 class Channel;
 class TimerQueue;
-class EventLoop : public IChannelCallback
+class EventLoop
 {
 public:
-
-	class Runner
-	{
-	public:
-		Runner(IRunCallback* cb, void* param)
-			: callback_(cb),
-			param_(param)
-		{
-		}
-
-		void run()
-		{
-			callback_->run(param_);
-		}
-	private:
-		IRunCallback* callback_;
-		void* param_;
-	};
+	typedef std::function<void()> Functor;
 
 	EventLoop();
 	virtual ~EventLoop();
@@ -38,25 +23,28 @@ public:
 	void loop();
 	void update(Channel* channel);
 
-	void queueInLoop(IRunCallback* cb, void* param);
+	void queueInLoop(Functor cb);
 
-	int runAt(Timestamp when, IRunCallback* cb);
-	int runAfter(double delay, IRunCallback* cb);
-	int runEvery(double interval, IRunCallback* cb);
+	int runAt(Timestamp when, TimerCallback cb);
+	int runAfter(double delay, TimerCallback cb);
+	int runEvery(double interval, TimerCallback cb);
 
 private:
 	void doPendingFunctors();
 	void wakeup();
 
 	void handleRead();
-	void handleWrite();
 
 	bool quit_;
 	Epoller* poller_;
+
 	int eventfd_;
-	Channel* channel_;
-	std::vector<Runner> pendingFunctors_;
+	Channel channel_;
+	std::vector<Functor> pendingFunctors_;
+
 	TimerQueue* timerQueue_;
 };
+
+} // namespace net
 
 #endif

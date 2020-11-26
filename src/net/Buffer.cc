@@ -1,4 +1,4 @@
-#include "buffer.h"
+#include "Buffer.h"
 
 using std::string;
 
