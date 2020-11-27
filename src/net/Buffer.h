@@ -3,6 +3,9 @@
 
 #include <string>
 
+namespace net
+{
+
 class Buffer
 {
 public:
@@ -19,5 +22,7 @@ public:
 private:
 	std::string buf_;
 };
+
+} // namespace net
 
 #endif

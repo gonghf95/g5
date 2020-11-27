@@ -1,6 +1,8 @@
 #ifndef ACCEPTOR_H
 #define ACCEPTOR_H
 
+#include "src/net/Channel.h"
+
 #include <functional>
 #include <memory>
 
@@ -12,7 +14,7 @@ class Channel;
 class Acceptor
 {
 public:
-	typedef function<void (int)> NewConnectionCallback;
+	typedef std::function<void (int)> NewConnectionCallback;
 
 	Acceptor(EventLoop* loop);
 	~Acceptor();

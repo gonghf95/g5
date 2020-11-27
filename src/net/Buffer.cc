@@ -2,6 +2,9 @@
 
 using std::string;
 
+namespace net
+{
+
 Buffer::Buffer()
 {
 }
@@ -41,3 +44,5 @@ string Buffer::retrieveAllAsString()
 {
 	return retrieveAsString(readableBytes());
 }
+
+} // namespace net

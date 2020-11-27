@@ -1,6 +1,7 @@
 #ifndef TCPSERVER_H
 #define TCPSERVER_H
 
+#include "src/net/Acceptor.h"
 #include "src/net/Callbacks.h"
 
 #include <map>
@@ -26,8 +27,8 @@ public:
 	{ messageCallback_ = std::move(cb); }
 
 private:
-	typedef shared_ptr<Acceptor> AcceptorPtr;
-	typedef std::map<int, TcpConnection*> ConnectionMap;
+	typedef std::shared_ptr<Acceptor> AcceptorPtr;
+	typedef std::map<int, TcpConnectionPtr> ConnectionMap;
 
 	void newConnection(int sockfd);
 

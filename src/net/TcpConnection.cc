@@ -1,26 +1,27 @@
-#include "tcpconnection.h"
-#include "channel.h"
-#include "inetcallback.h"
-#include "eventloop.h"
+#include "src/net/TcpConnection.h"
+#include "src/net/Channel.h"
+#include "src/net/EventLoop.h"
 
 #include <unistd.h>
 #include <string.h>
 
 using std::string;
 
-TcpConnection::TcpConnection(EventLoop* loop, int fd)
- : fd_(fd),
- callback_(NULL),
- loop_(loop)
+namespace net
 {
-	channel_ = new Channel(loop_, fd_);
-	channel_->setCallback(this);
-	channel_->enableReading();
+
+TcpConnection::TcpConnection(EventLoop* loop, int fd)
+	: loop_(loop),
+	fd_(fd),
+	channel_(loop_, fd_)
+{
+	channel_.setReadCallback(std::bind(&TcpConnection::handleRead, this));
+	channel_.setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
+	channel_.enableReading();
 }
 
 TcpConnection::~TcpConnection()
 {
-	delete channel_;
 }
 
 void TcpConnection::handleRead()
@@ -39,47 +40,33 @@ void TcpConnection::handleRead()
 		}
 		return;
 	}
-	inBuf_.append(string(buf, nread));
-	if(callback_ != NULL)
-		callback_->onMessage(this, inBuf_);
+
+	inputBuf_.append(string(buf, nread));
+
+	messageCallback_(shared_from_this(), &inputBuf_, Timestamp::now());
 }
 
 void TcpConnection::handleWrite()
 {
-	if(channel_->writable())
+	if(channel_.isWriting())
 	{
-		int nwrite = write(fd_, outBuf_.peek(), outBuf_.readableBytes());
+		int nwrite = write(fd_, outputBuf_.peek(), outputBuf_.readableBytes());
 		if(nwrite > 0)
 		{
-			outBuf_.retrieve(nwrite);
-			if(outBuf_.readableBytes() <= 0)
+			outputBuf_.retrieve(nwrite);
+			if(outputBuf_.readableBytes() <= 0)
 			{
-				channel_->enableWriting(false);
-				loop_->queueInLoop(this, NULL);
+				channel_.enableWriting(false);
+				loop_->queueInLoop(std::bind(writeCompleteCallback_, shared_from_this()));
 			}
 		}
 	}
 }
 
-void TcpConnection::run(void* param)
-{
-	if(callback_!=NULL)
-	{
-		callback_->onWriteComplete();
-	}
-}
-
-void TcpConnection::setCallback(INetCallback* cb)
-{
-	callback_ = cb;
-	if(callback_ != NULL)
-		callback_->onConnection(this);
-}
-
 void TcpConnection::send(const string& msg)
 {
 	int nwrite = 0;
-	if(outBuf_.readableBytes() <= 0)
+	if(outputBuf_.readableBytes() <= 0)
 	{
 		nwrite = write(fd_, msg.c_str(), msg.length());
 		if(nwrite == -1)
@@ -88,14 +75,16 @@ void TcpConnection::send(const string& msg)
 		}
 		else if(nwrite == static_cast<int>(msg.length()))
 		{
-			loop_->queueInLoop(this, NULL);
+			loop_->queueInLoop(std::bind(writeCompleteCallback_, shared_from_this()));
 		}
 	}
 
 	if(nwrite < static_cast<int>(msg.length()))
 	{
-		outBuf_.append(msg.substr(nwrite, msg.length()));
-		if(!channel_->writable())
-			channel_->enableWriting(true);
+		outputBuf_.append(msg.substr(nwrite, msg.length()));
+		if(!channel_.isWriting())
+			channel_.enableWriting(true);
 	}
 }
+
+} // namespace net

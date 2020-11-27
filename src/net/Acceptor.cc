@@ -1,12 +1,11 @@
-#include "acceptor.h"
-#include "channel.h"
-#include "iacceptorcallback.h"
-#include "ichannelcallback.h"
-#include "eventloop.h"
+#include "src/net/Acceptor.h"
+#include "src/net/EventLoop.h"
+
 #include <assert.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 
 const char kIP[] = "127.0.0.1";
@@ -49,7 +48,7 @@ Acceptor::Acceptor(EventLoop* loop)
 	listenfd_(detail::createAndListen(kIP, kPort)),
 	channel_(loop, listenfd_)
 {
-	channel_.setReadEventCallback(std::bind(&Acceptor::handleRead, this));
+	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
 }
 
 Acceptor::~Acceptor()
@@ -61,14 +60,14 @@ void Acceptor::handleRead()
 {
 	struct sockaddr_in cliaddr;
 	socklen_t addrlen = sizeof(cliaddr);
-	int connfd = accept(listenfd_, (struct sockaddr*)&cliaddr, &addrlen);
-	assert(connfd != -1);
+	int sockfd = accept(listenfd_, (struct sockaddr*)&cliaddr, &addrlen);
+	assert(sockfd != -1);
 
-	int flags = fcntl(connfd, F_GETFL);
+	int flags = fcntl(sockfd, F_GETFL);
 	flags |= O_NONBLOCK;
-	fcntl(connfd, F_SETFL, flags);
+	fcntl(sockfd, F_SETFL, flags);
 
-	newConnectionCallback(connfd);
+	newConnectionCallback_(sockfd);
 }
 
 void Acceptor::listen()

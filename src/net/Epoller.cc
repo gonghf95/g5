@@ -5,6 +5,9 @@
 
 using std::vector;
 
+namespace net
+{
+
 Epoller::Epoller()
 {
 	epfd_ = epoll_create1(0);
@@ -34,3 +37,5 @@ void Epoller::update(Channel* channel)
 	int fd = channel->fd();
 	epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &ev);
 }
+
+} // namespace net
