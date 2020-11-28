@@ -1,7 +1,6 @@
 #ifndef TIMERQUEUE_H
 #define TIMERQUEUE_H
 
-#include "src/net/ichannelcallback.h"
 #include "src/net/Timer.h"
 #include "src/base/Timestamp.h"
 #include "src/net/Callbacks.h"
