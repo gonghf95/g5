@@ -3,16 +3,19 @@
 
 #include "src/base/Timestamp.h"
 
+#include <iostream>
 #include <functional>
 #include <memory>
 
 namespace net
 {
 
+using std::cout;
+using std::endl;
+
 using std::placeholders::_1;
 using std::placeholders::_2;
 using std::placeholders::_3;
-
 
 
 class Buffer;

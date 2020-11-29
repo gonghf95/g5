@@ -6,9 +6,17 @@
 #include <string.h>
 
 using std::string;
+using namespace net;
 
-namespace net
+void net::defaultConnectionCallback(const TcpConnectionPtr& conn)
 {
+	cout << "new connection\n";
+}
+
+void net::defaultMessageCallback(const TcpConnectionPtr& conn, Buffer* buf, Timestamp)
+{
+	cout << buf->retrieveAllAsString();
+}
 
 TcpConnection::TcpConnection(EventLoop* loop, int fd)
 	: loop_(loop),
@@ -17,7 +25,6 @@ TcpConnection::TcpConnection(EventLoop* loop, int fd)
 {
 	channel_.setReadCallback(std::bind(&TcpConnection::handleRead, this));
 	channel_.setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
-	channel_.enableReading();
 }
 
 TcpConnection::~TcpConnection()
@@ -73,7 +80,7 @@ void TcpConnection::send(const string& msg)
 		{
 			fprintf(stderr, "err: %d %s\n", errno, strerror(errno));
 		}
-		else if(nwrite == static_cast<int>(msg.length()))
+		else if((nwrite == static_cast<int>(msg.length())) && writeCompleteCallback_)
 		{
 			loop_->queueInLoop(std::bind(writeCompleteCallback_, shared_from_this()));
 		}
@@ -87,4 +94,9 @@ void TcpConnection::send(const string& msg)
 	}
 }
 
-} // namespace net
+void TcpConnection::connectEstablished()
+{
+	channel_.enableReading();
+
+	connectionCallback_(shared_from_this());
+}

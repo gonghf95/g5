@@ -1,2 +1,2 @@
 #add_subdirectory(httpserver)
-#add_subdirectory(echoserver)
+add_subdirectory(echoserver)

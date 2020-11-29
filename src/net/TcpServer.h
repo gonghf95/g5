@@ -22,7 +22,6 @@ public:
 
 	void setConnectionCallback(ConnectionCallback cb)
 	{ connectionCallback_ = std::move(cb); }
-
 	void setMessageCallback(MessageCallback cb)
 	{ messageCallback_ = std::move(cb); }
 
@@ -36,6 +35,7 @@ private:
 	Acceptor acceptor_;
 
 	ConnectionMap connections_;
+
 	ConnectionCallback connectionCallback_;
 	MessageCallback messageCallback_;
 };

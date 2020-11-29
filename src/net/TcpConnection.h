@@ -28,6 +28,8 @@ public:
 	void setMessageCallback(MessageCallback cb)
 	{ messageCallback_ = std::move(cb); }
 
+	void connectEstablished();
+
 private:
 	void handleRead();
 	void handleWrite();

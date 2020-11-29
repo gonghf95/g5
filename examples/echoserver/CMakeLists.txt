@@ -1,7 +1,7 @@
 set(SRCS
- echoserver.cc
+ EchoServer.cc
  main.cc
 )
 
-add_executable(echoserver ${SRCS})
-target_link_libraries(echoserver g5_base g5_net)
+add_executable(EchoServer ${SRCS})
+target_link_libraries(EchoServer g5_base g5_net)

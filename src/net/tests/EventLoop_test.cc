@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 
 	net::EventLoop event_loop;
 
-	Timestamp when = addTime(Timestamp::now(), 5);
+	//Timestamp when = addTime(Timestamp::now(), 5);
 	//event_loop.runAt(when, &test);
 
 	event_loop.runEvery(5, cb);
