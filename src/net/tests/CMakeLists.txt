@@ -1,3 +1,6 @@
+add_executable(AtomicInteger_test AtomicInteger_test.cc)
+target_link_libraries(AtomicInteger_test g5_base g5_net)
+
 add_executable(EventLoop_test EventLoop_test.cc)
 target_link_libraries(EventLoop_test g5_base g5_net)
 
