@@ -16,7 +16,7 @@ public:
 		pthread_cond_init(&cond_, NULL);
 	}
 
-	~Condtion()
+	~Condition()
 	{
 		pthread_cond_destroy(&cond_);
 	}
@@ -36,7 +36,7 @@ public:
 
 	void notifyAll()
 	{
-		pthread_cond_boardcast(&cond_);
+		pthread_cond_broadcast(&cond_);
 	}
 
 private:

@@ -1,6 +1,9 @@
 #ifndef BASE_COUNTDOWNLATCH_H
 #define BASE_COUNTDOWNLATCH_H
 
+#include "src/base/Mutex.h"
+#include "src/base/Condition.h"
+
 namespace base
 {
 

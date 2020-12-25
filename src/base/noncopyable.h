@@ -1,7 +1,7 @@
-#ifndef G5_BASE_NONCOPYABLE_H
-#define G5_BASE_NONCOPYABLE_H
+#ifndef BASE_NONCOPYABLE_H
+#define BASE_NONCOPYABLE_H
 
-namespace g5
+namespace base
 {
 
 class noncopyable
@@ -15,6 +15,6 @@ protected:
 	~noncopyable() = default;
 };
 
-} // namespace g5
+} // namespace base
 
 #endif

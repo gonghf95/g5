@@ -4,6 +4,7 @@
 #include "src/base/noncopyable.h"
 #include "src/base/CurrentThread.h"
 #include <pthread.h>
+#include <assert.h>
 
 namespace base
 {
@@ -16,10 +17,10 @@ public:
 		pthread_mutex_init(&mutex_, NULL);
 	}
 
-	~Mutex()
+	~MutexLock()
 	{
-		assert(holer_ == 0);
-		pthread_mutex_destory(&mutex_);
+		assert(holder_ == 0);
+		pthread_mutex_destroy(&mutex_);
 	}
 
 	void lock()
@@ -45,13 +46,13 @@ private:
 	class UnassignGuard
 	{
 	public:
-		UnassignGuard(Mutex& owner)
+		UnassignGuard(MutexLock& owner)
 			: owner_(owner)
 		{
 			owner_.unassignHolder();
 		}
 
-		~UnassignGuard(MutexLock& mutex)
+		~UnassignGuard()
 		{
 			owner_.assignHolder();
 		}
@@ -77,8 +78,7 @@ private:
 class MutexLockGuard : noncopyable
 {
 public:
-	MutexLockGuard(MutexLock& mutex)
-		: mutex_(mutex)
+	explicit MutexLockGuard(MutexLock& mutex) : mutex_(mutex)
 	{
 		mutex_.lock();
 	}
@@ -89,7 +89,7 @@ public:
 	}
 
 private:
-	MuteLock mutex_;
+	MutexLock mutex_;
 };
 
 } // namespace base

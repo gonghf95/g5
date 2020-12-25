@@ -3,8 +3,8 @@ set(base_SRCS
  CurrentThread.cc
  Thread.cc
  Timestamp.cc
- timezone.cc
- date.cc
+ TimeZone.cc
+ Date.cc
 )
 
 add_library(g5_base ${base_SRCS})

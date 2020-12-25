@@ -1,5 +1,7 @@
 #include "src/base/CountDownLatch.h"
 
+using namespace base;
+
 CountDownLatch::CountDownLatch(int count)
 	: mutex_(),
 	condition_(mutex_),
