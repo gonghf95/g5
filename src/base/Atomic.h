@@ -1,16 +1,18 @@
-#ifndef ATOMIC_INTEGER_H
-#define ATOMIC_INTEGER_H
+#ifndef BASE_ATOMIC_H
+#define BASE_ATOMIC_H
+
+#include "src/base/noncopyable.h"
 
 #include <stdint.h>
 
-namespace net
+namespace base
 {
 
 namespace detail
 {
 
 template<class T>
-class AtomicInteger
+class AtomicInteger : noncopyable
 {
 public:
 	AtomicInteger()
@@ -54,6 +56,6 @@ private:
 typedef detail::AtomicInteger<int32_t> AtomicInt32;
 typedef detail::AtomicInteger<int64_t> AtomicInt64;
 
-} // namespace net
+} // namespace base
 
 #endif

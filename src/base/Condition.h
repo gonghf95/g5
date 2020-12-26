@@ -40,7 +40,7 @@ public:
 	}
 
 private:
-	MutexLock mutex_;
+	MutexLock& mutex_;
 	pthread_cond_t cond_;
 };
 

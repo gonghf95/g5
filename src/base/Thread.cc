@@ -1,6 +1,8 @@
 #include "src/base/Thread.h"
+#include "src/base/Timestamp.h"
 
 #include <sys/syscall.h>
+#include <sys/prctl.h>
 
 namespace base
 {
@@ -26,7 +28,7 @@ public:
 	{
 		CurrentThread::t_threadName = "main";
 		CurrentThread::tid();
-		pthread_atfork(NULL, NULL, &afterfork);
+		pthread_atfork(NULL, NULL, &afterFork);
 	}
 };
 
@@ -40,7 +42,7 @@ struct ThreadData
 	pid_t* tid_;
 	CountDownLatch* latch_;
 
-	ThreadData(ThreadFunc func, const string& name, pid* tid, CountDownLatch* latch) 
+	ThreadData(ThreadFunc func, const string& name, pid_t* tid, CountDownLatch* latch) 
 		: func_(std::move(func)),
 		name_(name),
 		tid_(tid),
@@ -168,7 +170,7 @@ void Thread::start()
 	}
 }
 
-void Thread::join()
+int Thread::join()
 {
 	assert(started_);
 	assert(!joined_);

@@ -1,6 +1,8 @@
 #include "src/base/CurrentThread.h"
 
 #include <string>
+#include <execinfo.h>
+#include <cxxabi.h>
 
 using std::string;
 

@@ -89,7 +89,7 @@ public:
 	}
 
 private:
-	MutexLock mutex_;
+	MutexLock& mutex_;
 };
 
 } // namespace base

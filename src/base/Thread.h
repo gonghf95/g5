@@ -2,11 +2,14 @@
 #define BASE_THREAD_H
 
 #include "src/base/noncopyable.h"
-#include "src/net/AtomicInteger.h"
+#include "src/base/CountDownLatch.h"
+#include "src/base/CurrentThread.h"
+#include "src/base/Atomic.h"
 
 #include <string>
 #include <unistd.h>
 #include <pthread.h>
+#include <functional>
 
 using std::string;
 
@@ -16,7 +19,7 @@ namespace base
 class Thread : public noncopyable
 {
 public:
-	typedef function<void()> ThreadFunc;
+	typedef std::function<void()> ThreadFunc;
 
 	explicit Thread(ThreadFunc, const string& name = string());
 	~Thread();
@@ -31,15 +34,17 @@ public:
 	static int numCreated() { return numCreated_.get(); }
 
 private:
+	void setDefaultName();
+
 	bool started_;
 	bool joined_;
-	pthread_t threadId_;
+	pthread_t pthreadId_;
 	pid_t tid_;
 	ThreadFunc func_;
 	string name_;
 	CountDownLatch latch_;
 
-	static net::AtomicInt32 numCreated_;
+	static AtomicInt32 numCreated_;
 };
 
 } // namespace base
