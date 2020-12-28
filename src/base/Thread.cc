@@ -1,5 +1,6 @@
 #include "src/base/Thread.h"
 #include "src/base/Timestamp.h"
+#include "src/base/Exception.h"
 
 #include <sys/syscall.h>
 #include <sys/prctl.h>

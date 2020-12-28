@@ -1,6 +1,6 @@
-#include "timezone.h"
-#include "noncopyable.h"
-#include "date.h"
+#include "src/base/TimeZone.h"
+#include "src/base/noncopyable.h"
+#include "src/base/Date.h"
 
 #include <string>
 #include <vector>
@@ -14,7 +14,7 @@
 //#define _BSD_SOURCE             /* See feature_test_macros(7) */
 #include <endian.h>
 
-namespace g5
+namespace base
 {
 
 namespace detail
@@ -77,9 +77,9 @@ inline void fillHMS(unsigned seconds, struct tm* utc)
 
 const int kSecondsPerDay = 24*60*60;
 
-} // namespace g5
+} // namespace base
 
-using namespace g5;
+using namespace base;
 using namespace std;
 
 struct TimeZone::Data
@@ -89,9 +89,6 @@ struct TimeZone::Data
 	vector<string> names;
 	string abbreviation;
 };
-
-namespace g5
-{
 
 namespace detail
 {
@@ -184,7 +181,7 @@ bool readTimeZoneFile(const char* zonefile, struct TimeZone::Data* data)
 				uint8_t isdst = f.readUInt8();
 				uint8_t abbrind = f.readUInt8();
 
-				data->localtimes.push_back(Localtime(gmtoff, isdst, abbrind));
+				data->localtimes.push_back(localtime(gmtoff, isdst, abbrind));
 			}
 
 			for(int i=0; i<timecnt; ++i)
@@ -245,7 +242,6 @@ const Localtime* findLocaltime(const TimeZone::Data& data, Transition sentry, Co
 
 } // namespace detail
 
-} // namespace g5
 
 TimeZone::TimeZone(const char* zonefile)
 	: data_(new TimeZone::Data)

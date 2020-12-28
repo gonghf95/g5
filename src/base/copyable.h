@@ -1,7 +1,7 @@
-#ifndef G5_BASE_COPYABLE_H
-#define G5_BASE_COPYABLE_H
+#ifndef BASE_COPYABLE_H
+#define BASE_COPYABLE_H
 
-namespace g5
+namespace base
 {
 
 class copyable
@@ -11,6 +11,6 @@ protected:
 	~copyable() = default;
 };
 
-} // namespace g5
+} // namespace base
 
 #endif

@@ -6,7 +6,7 @@
 #include <time.h>
 #include <memory>
 
-namespace g5
+namespace base
 {
 
 class TimeZone : public copyable
@@ -35,5 +35,5 @@ private:
 	std::shared_ptr<Data> data_;
 };
 
-} // namespace g5
+} // namespace base
 #endif

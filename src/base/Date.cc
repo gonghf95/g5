@@ -1,9 +1,9 @@
-#include "date.h"
+#include "src/base/Date.h"
 
 #include <stdio.h>
 #include <time.h>
 
-namespace g5
+namespace base
 {
 
 namespace detail
@@ -40,8 +40,8 @@ const int Date::kJulianDayOf1970_01_01 = detail::getJulianDayNumber(1970, 1, 1);
 
 } // namespace g5
 
-using namespace g5;
-using namespace g5::detail;
+using namespace base;
+using namespace base::detail;
 
 Date::Date(int y, int m, int d)
 	: julianDayNumber_(getJulianDayNumber(y, m, d))

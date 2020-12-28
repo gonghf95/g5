@@ -22,12 +22,14 @@ public:
 	
 	T get()
 	{
-		return __sync_val_compare_and_swap(&value_, 0, 0);
+		return __atomic_load_n(&value_, __ATOMIC_SEQ_CST);
+		//return __sync_val_compare_and_swap(&value_, 0, 0);
 	}
 
 	T getAndAdd(T x)
 	{
-		return __sync_val_fetch_and_add(&value_, x);
+		return __sync_fetch_and_add(&value_, x);
+		//return __sync_val_fetch_and_add(&value_, x);
 	}
 
 	T addAndGet(T x)

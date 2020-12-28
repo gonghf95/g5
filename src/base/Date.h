@@ -4,7 +4,9 @@
 #include "src/base/types.h"
 #include "src/base/copyable.h"
 
-namespace g5
+#include <string>
+
+namespace base
 {
 
 class Date : public copyable
@@ -39,7 +41,7 @@ public:
 
 	bool valid() const { return julianDayNumber_ > 0; }
 
-	string toIsoString() const;
+	std::string toIsoString() const;
 
 	struct YearMonthDay yearMonthDay() const;
 
@@ -79,6 +81,6 @@ inline bool operator==(Date x, Date y)
 	return x.julianDayNumber() == y.julianDayNumber();
 }
 
-} // namespace g5
+} // namespace base
 
 #endif
