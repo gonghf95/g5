@@ -90,6 +90,9 @@ struct TimeZone::Data
 	string abbreviation;
 };
 
+namespace base
+{
+
 namespace detail
 {
 
@@ -181,7 +184,7 @@ bool readTimeZoneFile(const char* zonefile, struct TimeZone::Data* data)
 				uint8_t isdst = f.readUInt8();
 				uint8_t abbrind = f.readUInt8();
 
-				data->localtimes.push_back(localtime(gmtoff, isdst, abbrind));
+				data->localtimes.push_back(base::detail::Localtime(gmtoff, isdst, abbrind));
 			}
 
 			for(int i=0; i<timecnt; ++i)
@@ -242,9 +245,10 @@ const Localtime* findLocaltime(const TimeZone::Data& data, Transition sentry, Co
 
 } // namespace detail
 
+} // namespace base
 
-TimeZone::TimeZone(const char* zonefile)
-	: data_(new TimeZone::Data)
+
+TimeZone::TimeZone(const char* zonefile) : data_(new TimeZone::Data)
 {
 	if(!detail::readTimeZoneFile(zonefile, data_.get()))
 	{
@@ -262,7 +266,7 @@ TimeZone::TimeZone(int eastOfUtc, const char* name)
 struct tm TimeZone::toLocalTime(time_t seconds) const
 {
 	struct tm localTime;
-	memZero(&localTime, sizeof(localTime));
+	memset(&localTime, 0, sizeof(localTime));
 	assert(data_ != NULL);
 	const Data& data(*data_);
 
@@ -306,7 +310,7 @@ time_t TimeZone::fromLocalTime(const struct tm& localTm) const
 struct tm TimeZone::toUtcTime(time_t secondsSinceEpoch, bool yday)
 {
 	struct tm utc;
-	memZero(&utc, sizeof(utc));
+	memset(&utc, 0, sizeof(utc));
 	utc.tm_zone = "GMT";
 	int seconds = static_cast<int>(secondsSinceEpoch % kSecondsPerDay);
 	int days = static_cast<int>(secondsSinceEpoch / kSecondsPerDay);

@@ -56,7 +56,7 @@ Date::Date(const struct tm& t)
 {
 }
 
-string Date::toIsoString() const
+std::string Date::toIsoString() const
 {
 	char buf[32];
 	YearMonthDay ymd(yearMonthDay());
