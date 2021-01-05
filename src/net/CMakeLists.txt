@@ -14,3 +14,4 @@ add_library(g5_net ${net_SRCS})
 target_link_libraries(g5_net g5_base pthread rt)
 
 add_subdirectory(tests)
+add_subdirectory(http)
