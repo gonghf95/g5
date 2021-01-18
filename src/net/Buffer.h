@@ -135,7 +135,7 @@ public:
 	{
 		ensureWritableBytes(len);
 		std::copy(data, data+len, beginWrite());
-		writerIndex_ += len;
+		hasWritten(len);
 	}
 	
 	void append(const void* data, size_t len)
@@ -233,6 +233,42 @@ public:
 		return x;
 	}
 
+	void prependInt64(int64_t x)
+	{
+		prepend(&x, sizeof(x));
+	}
+
+	void prependInt32(int32_t x)
+	{
+		prepend(&x, sizeof(x));
+	}
+
+	void prependInt16(int16_t x)
+	{
+		prepend(&x, sizeof(x));
+	}
+
+	void prependInt8(int8_t x)
+	{
+		prepend(&x, sizeof(x));
+	}
+
+	void prepend(const void* data, size_t len)
+	{
+		assert(len <= prependableBytes());
+		readerIndex_ -= len;
+		const char* d = static_cast<const char*>(data);
+		std::copy(d, d+len, begin()+readerIndex_);
+	}
+
+	void shrink(size_t reserve)
+	{
+		Buffer other;
+		other.ensureWritableBytes(readableBytes() + reserve);
+		other.append(retrieveAsString(readableBytes()));
+		swap(other);
+	}
+
 private:
 	char* begin()
 	{ return &*buffer_.begin(); }
@@ -242,6 +278,21 @@ private:
 
 	void makeSpace(size_t len)
 	{
+		if(prependableBytes() + writableBytes() < len + kCheapPrepend)
+		{
+			buffer_.resize(writerIndex_ + len);
+		}
+		else
+		{
+			assert(kCheapPrepend<readerIndex_);
+			size_t readable = readableBytes();
+			std::copy(begin()+readerIndex_,
+						begin()+writerIndex_,
+						begin()+kCheapPrepend);
+			readerIndex_ = kCheapPrepend;
+			writerIndex_ = readerIndex_ + readable;
+			assert(len <= writableBytes());
+		}
 	}
 
 	std::vector<char> buffer_;
