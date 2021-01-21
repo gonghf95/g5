@@ -116,7 +116,7 @@ private:
 template<typename ValueType>
 ValueType any_cast(const any& operand)
 {
-	assert(operand().type() == typeid(ValueType));
+	assert(operand.type() == typeid(ValueType));
 	return static_cast<any::holder<ValueType>*>(operand.content)->held;
 }
 
