@@ -3,18 +3,23 @@
 
 #include "src/base/noncopyable.h"
 #include "src/base/Thread.h"
-#include "src/base/MutexLock.h"
+#include "src/base/Mutex.h"
 #include "src/base/Condition.h"
 #include <functional>
 #include <memory>
 #include <string>
+
+using base::Thread;
+using base::MutexLock;
+using base::MutexLockGuard;
+using base::Condition;
 
 namespace net
 {
 
 class EventLoop;
 
-class EventLoopThread : noncopyable
+class EventLoopThread : base::noncopyable
 {
 public:
 	typedef std::function<void (EventLoop*)> ThreadInitCallback;
@@ -30,7 +35,7 @@ private:
 	EventLoop* loop_;
 	bool exiting_;
 	Thread thread_;
-	Mutex mutex_;
+	MutexLock mutex_;
 	Condition cond_;
 	ThreadInitCallback callback_;
 

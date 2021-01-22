@@ -1,11 +1,14 @@
 #include "src/net/EventLoopThread.h"
+#include "src/net/EventLoop.h"
+
+using namespace net;
 
 EventLoopThread::EventLoopThread(const ThreadInitCallback& cb, const std::string& name)
 	: loop_(NULL),
 	exiting_(false),
-	mutex_(),
 	thread_(std::bind(&EventLoopThread::threadFunc, this), name),
-	condition_(mutex_),
+	mutex_(),
+	cond_(mutex_),
 	callback_(cb)
 {
 }
@@ -15,7 +18,7 @@ EventLoopThread::~EventLoopThread()
 	exiting_ = true;
 	if(loop_ != NULL)
 	{
-		loop_->quit();
+		//loop_->quit();
 		thread_.join();
 	}
 }
@@ -37,7 +40,7 @@ EventLoop* EventLoopThread::startLoop()
 	return loop;
 }
 
-void EventLoop::threadFunc()
+void EventLoopThread::threadFunc()
 {
 	EventLoop loop;
 

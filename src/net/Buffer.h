@@ -5,6 +5,9 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <string.h>
+#include <assert.h>
 
 namespace net
 {
@@ -25,6 +28,10 @@ public:
 		assert(prependableBytes() == kCheapPrepend);
 	}
 
+	~Buffer()
+	{
+	}
+
 	void swap(Buffer& rhs)
 	{
 		buffer_.swap(rhs.buffer_);
@@ -41,12 +48,12 @@ public:
 	size_t prependableBytes() const
 	{ return readerIndex_; }
 
-	const char* peek()
+	const char* peek() const
 	{ return begin() + readerIndex_; }
 
 	const char* findCRLF() const
 	{
-		const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLf+2);
+		const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF+2);
 		return crlf == beginWrite() ? NULL : crlf;
 	}
 
@@ -60,7 +67,7 @@ public:
 
 	const char* findEOL() const
 	{
-		const void* eol = memchr(peek(), '\n', readableBytes());
+		const void* eol = ::memchr(peek(), '\n', readableBytes());
 		return static_cast<const char*>(eol);
 	}
 
@@ -143,6 +150,11 @@ public:
 		append(static_cast<const char*>(data), len);
 	}
 
+	void append(const std::string& x)
+	{
+		append(x.data(), x.length());
+	}
+
 	void ensureWritableBytes(size_t len)
 	{
 		if(writableBytes() < len)
@@ -174,28 +186,28 @@ public:
 		readerIndex_ -= len;
 	}
 
-	int64_t readInt64() const
+	int64_t readInt64()
 	{
 		int64_t x = peekInt64();
 		retrieveInt64();
 		return x;
 	}
 
-	int32_t readInt32() const
+	int32_t readInt32()
 	{
 		int32_t x = peekInt32();
 		retrieveInt32();
 		return x;
 	}
 
-	int16_t readInt16() const
+	int16_t readInt16()
 	{
 		int16_t x = peekInt16();
 		retrieveInt16();
 		return x;
 	}
 
-	int8_t readInt8() const
+	int8_t readInt8()
 	{
 		int8_t x = peekInt8();
 		retrieveInt8();
