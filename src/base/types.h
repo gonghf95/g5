@@ -5,7 +5,7 @@
 #include <string.h>
 #include <string>
 
-namespace g5
+namespace base
 {
 
 using std::string;
@@ -27,6 +27,6 @@ inline To down_cast(From* f)
 	return static_cast<To>(f);
 }
 
-} // namespace g5
+} // namespace base
 
 #endif

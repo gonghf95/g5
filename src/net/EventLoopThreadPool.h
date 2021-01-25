@@ -13,7 +13,7 @@ namespace net
 class EventLoop;
 class EventLoopThread;
 
-class EventLoopThreadPool : noncopyable
+class EventLoopThreadPool : base::noncopyable
 {
 public:
 	typedef std::function<void (EventLoop*)> ThreadInitCallback;
