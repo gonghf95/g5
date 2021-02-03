@@ -88,3 +88,36 @@ int FileUtil::ReadSmallFile::readToString(int maxSize,
 
 	return err;
 }
+
+int FileUtil::ReadSmallFile::readToBuffer(int* size)
+{
+	int err = err_;
+	if(fd_ >= 0)
+	{
+		ssize_t n = ::pread(fd_, buf_, sizeof(buf_)-1, 0);
+		if(n>=0)
+		{
+			if(size)
+			{
+				*size = static_cast<int>(n);
+			}
+			buf_[n] = '\0';
+		}
+		else
+		{
+			err = errno;
+		}
+	}
+	return err;
+}
+
+template<> int FileUtil::readFile(std::string filename,
+					int maxSize,
+					std::string* content,
+					int64_t*, int64_t*, int64_t*);
+
+template<>
+int FileUtil::ReadSmallFile::readToString(int maxSize, std::string* content,
+									int64_t*,
+									int64_t*,
+									int64_t*);
