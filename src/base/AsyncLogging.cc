@@ -44,5 +44,16 @@ void AsyncLogging::append(const char* logline, int len)
 
 void AsyncLogging::threadFunc()
 {
-
+	assert(running_ == true);
+	LogFile output(basename_);
+	BufferPtr newBuffer1(new Buffer);
+	BufferPtr newBuffer2(new Buffer);
+	newBuffer1->bzero();
+	newBuffer2->bzero();
+	BufferVector buffersToWrite;
+	buffersToWrite.reserve(16);
+	while(running_)
+	{
+		
+	}
 }
