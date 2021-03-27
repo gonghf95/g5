@@ -99,5 +99,21 @@ LogStream& LogStream::operator<<(const void* v)
 
 LogStream& LogStream::operator<<(double v)
 {
+	if(buffer_.avail() >= kMaxNumericSize)
+	{
+		int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12g", v);
+		buffer_.add(len);
+	}
 	return *this;
 }
+
+LogStream& LogStream::operator<<(long double v)
+{
+	if(buffer_.avail() >= kMaxNumericSize)
+	{
+		int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12Lg", v);
+		buffer_.add(len);
+	}
+	return *this;
+}
+

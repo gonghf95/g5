@@ -64,7 +64,7 @@ public:
 	LogStream& operator<<(long long);
 	LogStream& operator<<(unsigned long long);
 
-	LogStream& operator<<(const void*);
+	//LogStream& operator<<(const void*);
 
 	LogStream& operator<<(float v)
 	{
