@@ -2,7 +2,7 @@
 #define BASE_LOGFILE_H
 
 #include "src/base/noncopyable.h"
-#include "src/base/MutexLock.h"
+#include "src/base/Mutex.h"
 #include "src/base/FileUtil.h"
 
 #include <string>

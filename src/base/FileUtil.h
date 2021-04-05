@@ -33,7 +33,7 @@ public:
 private:
 	int fd_;
 	int err_;
-	char buf[kBufferSize];
+	char buf_[kBufferSize];
 };
 
 template<typename String>
@@ -44,9 +44,11 @@ int readFile(std::string filename,
 			int64_t* modifyTime = NULL,
 			int64_t* createTime = NULL)
 {
-	ReadSmallFile file(filename);
+	FileUtil::ReadSmallFile file(filename);
 	return file.readToString(maxSize, content, fileSize, modifyTime, createTime);
 }
+
+} // namespace FileUtil
 
 class AppendFile : noncopyable
 {
@@ -68,8 +70,6 @@ private:
 	char buffer_[64*1024];
 	off_t writtenBytes_;
 };
-
-} // namespace FileUtil
 
 } // namespace base
 

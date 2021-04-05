@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <limits>
 
+using namespace base;
+
 const char digits[] = "9876543210123456789";
 const char* zero = digits + 9;
 
@@ -89,11 +91,6 @@ LogStream& LogStream::operator<<(long long v)
 LogStream& LogStream::operator<<(unsigned long long v)
 {
 	formatInteger(v);
-	return *this;
-}
-
-LogStream& LogStream::operator<<(const void* v)
-{
 	return *this;
 }
 

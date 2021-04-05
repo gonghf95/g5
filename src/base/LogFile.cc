@@ -33,7 +33,7 @@ void LogFile::append_unlocked(const char* logline, int len)
 {
 	file_->append(logline, len);
 	++count_;
-	if(count >= flushEveryN_)
+	if(count_ >= flushEveryN_)
 	{
 		count_ = 0;
 		file_->flush();

@@ -2,6 +2,12 @@
 #define BASE_ASYNCLOGGING_H
 
 #include "src/base/noncopyable.h"
+#include "src/base/LogStream.h"
+#include "src/base/Thread.h"
+
+#include <string>
+#include <vector>
+#include <memory>
 
 namespace base
 {
@@ -36,8 +42,8 @@ public:
 
 private:
 	typedef FixedBuffer<kLargeBuffer> Buffer;
-	typedef std::vector<std::shared_ptr<Buffer>> BufferVector;
 	typedef std::shared_ptr<Buffer> BufferPtr;
+	typedef std::vector<BufferPtr> BufferVector;
 
 	void threadFunc();
 
@@ -49,7 +55,7 @@ private:
 	Condition cond_;
 	BufferPtr currentBuffer_;
 	BufferPtr nextBuffer_;
-	BufferPtr buffers_;
+	BufferVector buffers_;
 	CountDownLatch latch_;
 };
 

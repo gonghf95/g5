@@ -1,9 +1,14 @@
 #include "src/base/FileUtil.h"
+#include "src/base/types.h"
+
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 using namespace base;
 
 FileUtil::ReadSmallFile::ReadSmallFile(std::string filename)
-	: fd_(::open(filename.c_str(), O_RDONLY|O_CLOSEXEC)),
+	: fd_(::open(filename.c_str(), O_RDONLY|O_CLOEXEC)),
 	err_(0)
 {
 	buf_[0] = '\0';
@@ -38,7 +43,7 @@ int FileUtil::ReadSmallFile::readToString(int maxSize,
 		if(fileSize)
 		{
 			struct stat statbuf;
-			if(::fstat(fd_, &statbuf) == )
+			if(::fstat(fd_, &statbuf) == 0)
 			{
 				if(S_ISREG(statbuf.st_mode))
 				{
@@ -116,8 +121,7 @@ template<> int FileUtil::readFile(std::string filename,
 					std::string* content,
 					int64_t*, int64_t*, int64_t*);
 
-template<>
-int FileUtil::ReadSmallFile::readToString(int maxSize, std::string* content,
+template<> int FileUtil::ReadSmallFile::readToString(int maxSize, std::string* content,
 									int64_t*,
 									int64_t*,
 									int64_t*);

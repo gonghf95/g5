@@ -1,4 +1,9 @@
 set(base_SRCS
+ Logging.cc
+ LogStream.cc
+ AsyncLogging.cc
+ LogFile.cc
+ FileUtil.cc
  ThreadPool.cc
  Exception.cc
  CountDownLatch.cc

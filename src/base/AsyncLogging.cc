@@ -1,6 +1,9 @@
 #include "src/base/AsyncLogging.h"
+#include "src/base/LogFile.h"
 
-AsyncLogging::AsyncLogging(const std::string basename, int flushInterval)
+using namespace base;
+
+AsyncLogging::AsyncLogging(const std::string& basename, int flushInterval)
 	: flushInterval_(flushInterval),
 	running_(false),
 	basename_(basename),

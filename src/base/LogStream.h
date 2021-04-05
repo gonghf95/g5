@@ -6,6 +6,9 @@
 #include <string.h>
 #include <string>
 
+namespace base
+{
+
 class AsyncLogging;
 const int kSmallBuffer = 4000;
 const int kLargeBuffer = 4000 * 1000;
@@ -116,7 +119,9 @@ private:
 
 	Buffer buffer_;
 
-	static const int kMaxNumbericSize = 32;
+	static const int kMaxNumericSize = 32;
 };
+
+} // namespace base
 
 #endif

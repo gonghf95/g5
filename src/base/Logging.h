@@ -4,14 +4,17 @@
 #include "src/base/noncopyable.h"
 #include "src/base/LogStream.h"
 
-class AsyncLoggin;
+namespace base
+{
+
+class AsyncLogging;
 class Logger : noncopyable
 {
 public:
 	Logger(const char* filename, int line);
 	~Logger();
 
-	LogStream& stream() { return impl.stream_; }
+	LogStream& stream() { return impl_.stream_; }
 
 	static void setLogFileName(std::string filename) { logFileName_ = filename; }
 	static std::string getLogFileName() { return logFileName_; }
@@ -33,5 +36,7 @@ private:
 };
 
 #define LOG Logger(__FILE__, __LINE__).stream()
+
+} // namespace base
 
 #endif

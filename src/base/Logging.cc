@@ -1,20 +1,23 @@
 #include "src/base/Logging.h"
 #include "src/base/CurrentThread.h"
 #include "src/base/Thread.h"
+#include "src/base/AsyncLogging.h"
 
 #include <assert.h>
 #include <iostream>
 #include <sys/time.h>
 
-static pthread_once_t once_control = PTHREAD_ONCE_INIT;
-static AsyncLoggin* AsyncLooger_;
+using namespace base;
+
+static pthread_once_t once_control_ = PTHREAD_ONCE_INIT;
+static AsyncLogging* AsyncLogger_;
 
 std::string Logger::logFileName_ = "./g5.log";
 
 void once_init()
 {
 	AsyncLogger_ = new AsyncLogging(Logger::getLogFileName());
-	AysncLogger_->start();
+	AsyncLogger_->start();
 }
 
 void output(const char* msg, int len)
@@ -26,7 +29,7 @@ void output(const char* msg, int len)
 Logger::Impl::Impl(const char* filename, int line)
 	: stream_(),
 	line_(line),
-	basename_(fileName)
+	basename_(filename)
 {
 	formatTime();
 }
@@ -44,13 +47,13 @@ void Logger::Impl::formatTime()
 }
 
 Logger::Logger(const char* filename, int line)
-	: imp_(filename, line)
+	: impl_(filename, line)
 {
 }
 
 Logger::~Logger()
 {
-	impl_.stream_ << " -- " impl_.basename_ << ":" < impl_.line_ << '\n';
+	impl_.stream_ << " -- " << impl_.basename_ << ":" << impl_.line_ << '\n';
 	const LogStream::Buffer& buf(stream().buffer());
 	output(buf.data(), buf.length());
 }
