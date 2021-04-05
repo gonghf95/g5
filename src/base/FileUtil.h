@@ -53,7 +53,7 @@ int readFile(std::string filename,
 class AppendFile : noncopyable
 {
 public:
-	explicit AppendFile(std::string filename);
+	explicit AppendFile(const std::string& filename);
 	~AppendFile();
 
 	void append(const char* logline, size_t len);
