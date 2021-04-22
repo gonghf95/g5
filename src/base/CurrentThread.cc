@@ -67,6 +67,7 @@ string statckTrace(bool demangle)
 		free(demangled);
 		free(strings);
 	}
+	return stack;
 }
 
 } // namespace CurrentThread

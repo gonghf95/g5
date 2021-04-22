@@ -6,6 +6,7 @@ set(base_SRCS
  FileUtil.cc
  ThreadPool.cc
  Exception.cc
+ Condition.cc
  CountDownLatch.cc
  CurrentThread.cc
  Thread.cc
